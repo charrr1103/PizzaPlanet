@@ -1,0 +1,1168 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
+
+public class Login extends Application{
+	private Connection connection;
+	private Stage primaryStage;
+	private Cart cart;
+	private static ArrayList<Item> itemList;
+	
+	@Override
+	public void start(Stage primaryStage) {
+		this.primaryStage = primaryStage;
+		
+		try {
+			connection = DriverManager.getConnection("jdbc:ucanaccess://C://Users//Charmaine Hooi//Downloads//PizzaPlanetDB.accdb");
+			if(connection != null) {
+				System.out.println("Successfully connected to database");
+			}
+		}catch(SQLException ex) {
+			ex.printStackTrace();
+			return;
+		}
+		
+		//login screen
+		ImageView logoView = new ImageView("PizzaPlanetLogo.png");
+		
+		VBox vb1 = new VBox();
+		vb1.setStyle("-fx-background-color: #1B339B; -fx-padding: 10px;");
+		vb1.setPrefWidth(500);
+		vb1.getChildren().add(logoView);
+		vb1.setAlignment(Pos.CENTER_LEFT);
+		
+		VBox vb2 = new VBox(20);
+		vb2.setPadding(new Insets(20));
+		vb2.setPrefWidth(500);
+		
+		Text header = new Text("Login");
+		header.setFont(Font.font("Futura", FontWeight.BOLD, 30));
+		
+		HBox headerBox = new HBox();
+		headerBox.getChildren().add(header);
+		headerBox.setAlignment(Pos.TOP_CENTER);
+		
+		//first name field
+		Label firstNameLabel = new Label("First name: ");
+		TextField firstnameTf = new TextField();
+		firstnameTf.setPromptText("Enter your first name");
+		firstnameTf.setPrefSize(300,  30);
+		
+		HBox firstnameBox = new HBox(20); 
+		firstnameBox.setPrefWidth(500);
+		firstnameBox.getChildren().addAll(firstNameLabel, firstnameTf);
+		
+		//last name field
+		Label lastnameLabel = new Label("Last name: ");
+		TextField lastnameTf = new TextField();
+		lastnameTf.setPromptText("Enter your last name");
+		lastnameTf.setPrefSize(300,  30);
+		
+		HBox lastnameBox = new HBox(20); 
+		lastnameBox.setPrefWidth(500);
+		lastnameBox.getChildren().addAll(lastnameLabel, lastnameTf);
+		
+		//email field
+		Label emailLabel = new Label("Email:         ");
+		TextField emailTf = new TextField();
+		emailTf.setPromptText("Enter your email");
+		emailTf.setPrefSize(300,  30);
+		
+		HBox emailBox = new HBox(20); 
+		emailBox.setPrefWidth(500);
+		emailBox.getChildren().addAll(emailLabel, emailTf);
+		
+		//password field
+		Label passwordLabel = new Label("Password:  ");
+		PasswordField passwordTf = new PasswordField();
+		passwordTf.setPromptText("Enter your password");
+		passwordTf.setPrefSize(300, 30);
+		
+		HBox passwordBox = new HBox(20); 
+		passwordBox.setPrefWidth(500);
+		passwordBox.getChildren().addAll(passwordLabel, passwordTf);
+		
+		//move on to last name field after first name done and hit ENTER
+		firstnameTf.setOnKeyPressed(e -> {
+			if(e.getCode() == KeyCode.ENTER) {
+				lastnameTf.requestFocus();
+			}
+		});
+		
+		//move on to email field after last name done and hit ENTER
+		lastnameTf.setOnKeyPressed(e -> {
+			if(e.getCode() == KeyCode.ENTER) {
+				emailTf.requestFocus();
+			}
+		});
+		
+		//move on to password field after email done and hit ENTER
+		emailTf.setOnKeyPressed(e -> {
+			if(e.getCode() == KeyCode.ENTER) {
+				passwordTf.requestFocus();
+			}
+		});
+		
+		//to display error message
+		HBox messageBox = new HBox();
+		Label message = new Label();
+		messageBox.getChildren().add(message);
+		messageBox.setAlignment(Pos.CENTER);
+		
+		//Login button
+		Button loginBt = new Button("Login");
+		loginBt.setPrefSize(150, 40);
+		loginBt.setStyle("-fx-background-color: #1B339B; -fx-text-fill: white;"); 
+		ButtonHoverBlue(loginBt);
+		
+		loginBt.setOnAction(e -> processUserInfo(firstnameTf, lastnameTf, emailTf, passwordTf, message));
+		
+		passwordTf.setOnAction(e -> loginBt.fire());
+		
+		HBox question1 = new HBox();
+		Text signup = new Text("Don't have an account? ");
+		Hyperlink signUpLink = new Hyperlink("Sign Up");
+		signUpLink.setTextFill(Color.BLUE);
+		signUpLink.setAlignment(Pos.CENTER);
+		HyperlinkHoverBlue(signUpLink);
+		question1.setAlignment(Pos.CENTER);
+		question1.getChildren().addAll(signup, signUpLink);
+		
+		signUpLink.setOnAction(e -> {
+			signUp();
+		});
+		
+		VBox inputBox = new VBox(30);
+		inputBox.setAlignment(Pos.CENTER);
+		inputBox.getChildren().addAll( firstnameBox, lastnameBox, emailBox,
+				passwordBox, loginBt, question1, messageBox);
+
+        vb2.getChildren().addAll(headerBox, inputBox); // Use the modified stackPane
+        vb2.setAlignment(Pos.CENTER);
+		
+		BorderPane bp = new BorderPane();
+		bp.setPadding(new Insets(10));
+		bp.setLeft(vb1);
+		bp.setRight(vb2);
+		
+		Scene scene = new Scene(bp, 1100, 700);
+		primaryStage.setScene(scene);
+		primaryStage.setTitle("Pizza Ordering System");
+		primaryStage.show();
+	}
+
+	private boolean authenticate(String firstname, String lastname, String email, String password) {
+		String query = "SELECT * FROM Customer WHERE firstname=? AND lastname=? AND email=? AND password=?";
+		
+		try(PreparedStatement stat = connection.prepareStatement(query)){
+			stat.setString(1,  firstname);
+			stat.setString(2,  lastname);
+			stat.setString(3, email);
+			stat.setString(4, password);
+			
+			try(ResultSet res = stat.executeQuery()){
+				return res.next();
+			}
+		}catch(SQLException ex) {
+			ex.printStackTrace();
+			
+		}
+		return false;
+				
+	}
+	
+	private void processUserInfo(TextField firstnameTf, TextField lastnameTf, TextField emailTf, PasswordField passwordTf, Label message) {
+		String firstname = firstnameTf.getText();
+		String lastname = lastnameTf.getText();
+		String email = emailTf.getText();
+		String password = passwordTf.getText();
+		
+		if(authenticate(firstname, lastname, email, password)) {
+			menu();
+		}
+		else {
+			System.out.println("Login Failed");
+			message.setText("Login Failed: Check login details again");
+			message.setTextFill(Color.RED);
+		}
+	}
+	
+	private void signUp() {
+		ImageView logoView = new ImageView("PizzaPlanetLogo.png");
+		
+		VBox vb1 = new VBox();
+		vb1.setStyle("-fx-background-color: #1B339B; -fx-padding: 10px;");
+		vb1.setPrefWidth(500);
+		vb1.getChildren().add(logoView);
+		vb1.setAlignment(Pos.CENTER_LEFT);
+		
+		VBox vb2 = new VBox(20);
+		vb2.setPadding(new Insets(20));
+		vb2.setPrefWidth(500);
+		
+		Text header = new Text("Sign Up");
+		header.setFont(Font.font("Futura", FontWeight.BOLD, 30));
+		
+		HBox headerBox = new HBox();
+		headerBox.getChildren().add(header);
+		headerBox.setAlignment(Pos.TOP_CENTER);
+		
+		//first name field
+		Label firstNameLabel = new Label("First name:            ");
+		TextField firstnameTf = new TextField();
+		firstnameTf.setPromptText("Enter your first name");
+		firstnameTf.setPrefSize(300,  30);
+		
+		HBox firstnameBox = new HBox(20); 
+		firstnameBox.setPrefWidth(500);
+		firstnameBox.getChildren().addAll(firstNameLabel, firstnameTf);
+		
+		//last name field
+		Label lastnameLabel = new Label("Last name:             ");
+		TextField lastnameTf = new TextField();
+		lastnameTf.setPromptText("Enter your last name");
+		lastnameTf.setPrefSize(300,  30);
+		
+		HBox lastnameBox = new HBox(20); 
+		lastnameBox.setPrefWidth(500);
+		lastnameBox.getChildren().addAll(lastnameLabel, lastnameTf);
+		
+		//email field
+		Label emailLabel = new Label("Email:                     ");
+		TextField emailTf = new TextField();
+		emailTf.setPromptText("example@mail.com");
+		emailTf.setPrefSize(300,  30);
+		
+		HBox emailBox = new HBox(20); 
+		emailBox.setPrefWidth(500);
+		emailBox.getChildren().addAll(emailLabel, emailTf);
+		
+		//phone number field
+		Label phoneNoLabel = new Label("Phone Number:     ");
+		TextField phoneNoTf = new TextField(); 
+		phoneNoTf.setPromptText("01x-xxxxxxx");
+		phoneNoTf.setPrefSize(300, 30);
+		
+		HBox phoneNoBox = new HBox(20); 
+		phoneNoBox.setPrefWidth(500);
+		phoneNoBox.getChildren().addAll(phoneNoLabel, phoneNoTf);
+		
+        
+		//password field
+		Label passwordLabel = new Label("Password:              ");
+		PasswordField passwordTf = new PasswordField();
+		passwordTf.setPromptText("Enter your password(at least 8 characters)");
+		passwordTf.setPrefSize(300, 30);
+		
+		HBox passwordBox = new HBox(20); 
+		passwordBox.setPrefWidth(500);
+		passwordBox.getChildren().addAll(passwordLabel, passwordTf);
+		
+		//confirm password field
+		Label CpasswordLabel = new Label("Confirm password:");
+		PasswordField CpasswordTf = new PasswordField();
+		CpasswordTf.setPromptText("Confirm your password");
+		CpasswordTf.setPrefSize(300, 30);
+		
+		HBox CpasswordBox = new HBox(20); 
+		CpasswordBox.setPrefWidth(500);
+		CpasswordBox.getChildren().addAll(CpasswordLabel, CpasswordTf);
+		
+		//move on to last name field after first name done and hit ENTER
+		firstnameTf.setOnKeyPressed(e -> {
+			if(e.getCode() == KeyCode.ENTER) {
+				lastnameTf.requestFocus();
+			}
+		});
+		
+		//move on to email field after last name done and hit ENTER
+		lastnameTf.setOnKeyPressed(e -> {
+			if(e.getCode() == KeyCode.ENTER) {
+				emailTf.requestFocus();
+			}
+		});
+		
+		//move on to phoneNo field after email done and hit ENTER
+		emailTf.setOnKeyPressed(e -> {
+			if(e.getCode() == KeyCode.ENTER) {
+				phoneNoTf.requestFocus();
+			}
+		});
+		
+		//move on to password field after phoneNo done and hit ENTER
+		phoneNoTf.setOnKeyPressed(e -> {
+			if(e.getCode() == KeyCode.ENTER) {
+				passwordTf.requestFocus();
+			}
+		});
+		
+		//move on to confirm password field after password done and hit ENTER
+		passwordTf.setOnKeyPressed(e -> {
+			if(e.getCode() == KeyCode.ENTER) {
+				CpasswordTf.requestFocus();
+			}
+		});		
+		
+		HBox messageBox = new HBox();
+		Label message = new Label();
+		messageBox.getChildren().add(message);
+		messageBox.setAlignment(Pos.CENTER);
+		
+		//Login button
+		Button signupBt = new Button("Sign Up");
+		signupBt.setPrefSize(150, 40);
+		signupBt.setStyle("-fx-background-color: #1B339B; -fx-text-fill: white;"); 
+		ButtonHoverBlue(signupBt);
+		
+		signupBt.setOnAction(e -> processSignup(firstnameTf, lastnameTf, emailTf, phoneNoTf, passwordTf, CpasswordTf, message));
+		
+		CpasswordTf.setOnAction(e -> signupBt.fire());
+		
+		HBox question2 = new HBox();
+		Text login = new Text("Already have an account? ");
+		Hyperlink loginLink = new Hyperlink("Login");
+		loginLink.setTextFill(Color.BLUE);
+		loginLink.setAlignment(Pos.CENTER);
+		HyperlinkHoverBlue(loginLink);
+		question2.setAlignment(Pos.CENTER);
+		question2.getChildren().addAll(login, loginLink);
+		
+		loginLink.setOnAction(e -> {
+			start(primaryStage);
+		});
+		
+		VBox inputBox = new VBox(30);
+		inputBox.setAlignment(Pos.CENTER);
+		inputBox.getChildren().addAll( firstnameBox, lastnameBox, emailBox, 
+				phoneNoBox, passwordBox, CpasswordBox, signupBt, question2, messageBox);
+
+        vb2.getChildren().addAll(headerBox, inputBox); // Use the modified stackPane
+        vb2.setAlignment(Pos.CENTER);
+		
+		BorderPane bp = new BorderPane();
+		bp.setPadding(new Insets(10));
+		bp.setLeft(vb1);
+		bp.setRight(vb2);
+		
+		Scene scene = new Scene(bp, 1100, 700);
+		primaryStage.setScene(scene);
+		primaryStage.setTitle("Pizza Ordering System");
+		primaryStage.show();
+	}
+	
+	public boolean userExists(String email) {
+        String queryEmail = "SELECT email FROM Customer WHERE email=?";
+        
+        try (Connection connection = DriverManager.getConnection("jdbc:ucanaccess://C://Users//Charmaine Hooi//Downloads//PizzaPlanetDB.accdb")) {
+            
+            try(PreparedStatement statEmail = connection.prepareStatement(queryEmail)){
+            	statEmail.setString(1, email);
+            	
+            	try(ResultSet resEmail = statEmail.executeQuery()){
+            		if(resEmail.next()) {
+            			System.out.println("Email exists: " + email);
+            			return true;
+            		}
+            	}
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(); // For debugging purposes
+            return false;
+        }finally {
+			if(connection != null) {
+				try {
+					connection.close();
+				}catch(SQLException ex) {
+					System.err.println("Error closing database connection");
+				}
+			}
+		}
+        return false;
+    }
+	
+	private void createUser(String firstname, String lastname, String password, String email, String phoneNo) {
+		String query = "INSERT INTO Customer(firstname, lastname, password, email, phoneNo) VALUES (?, ?, ?, ?, ?)";
+		
+		try(Connection connection  = DriverManager.getConnection("jdbc:ucanaccess://C://Users//Charmaine Hooi//Downloads//PizzaPlanetDB.accdb")){
+			PreparedStatement stat = connection.prepareStatement(query);
+			
+			stat.setString(1, firstname);
+			stat.setString(2, lastname);
+	        stat.setString(3, password);
+	        stat.setString(4, email);
+	        stat.setString(5,  phoneNo);
+	        stat.executeUpdate();
+	        
+	        System.out.println("User created: " + firstname + " " + lastname);
+	        
+		}catch(SQLException ex) {
+			ex.printStackTrace();
+			System.err.println("Error creating user");
+		}finally {
+			if(connection != null) {
+				try {
+					connection.close();
+				}catch(SQLException ex) {
+					System.err.println("Error closing database connection");
+				}
+			}
+		}
+	}
+	
+	private void processSignup(TextField firstnameTf, TextField lastnameTf, TextField emailTf,
+			TextField phoneNoTf, TextField passwordTf, TextField CpasswordTf, Label message) {
+		String firstname = firstnameTf.getText();
+		String lastname = lastnameTf.getText();
+		String email = emailTf.getText();
+		String phoneNo = phoneNoTf.getText();
+		String password = passwordTf.getText();
+		String Cpassword = CpasswordTf.getText();
+		
+		if(userExists(email)) {
+			message.setText("Email already exists!");
+			message.setTextFill(Color.RED);
+		}
+		else {
+			if(checkPasswordLength(passwordTf, message)) {
+					if(password.equals(Cpassword)) {
+						createUser(firstname, lastname, password, email, phoneNo);
+						System.out.println("Account created successfully!");
+						start(primaryStage);
+					}
+					else {
+						message.setText("Passwords do not match!");;
+						message.setTextFill(Color.RED);
+					}
+			}
+		}
+	}
+	
+	private boolean checkPasswordLength(TextField passwordTf, Label message) {
+		String password = passwordTf.getText();
+		
+		if(password.length() < 8) {
+			message.setText("Password length must be more than 8 characters!");
+			message.setTextFill(Color.RED);
+			return false;
+		}
+		else {
+			return true;
+		}
+		
+	}
+	
+
+	//main menu
+ 	private void menu() {
+ 		
+ 		cart = new Cart();
+		
+		HBox logoHeader = new HBox();
+		logoHeader.setStyle("-fx-background-color: #1B339B;");
+		logoHeader.setPrefHeight(55);
+		logoHeader.setMinHeight(0);
+		ImageView logoView = new ImageView("PizzaPlanetLogo.png");
+		logoView.setFitWidth(110);
+		logoView.setFitHeight(110);
+		
+		logoHeader.getChildren().add(logoView);
+		logoHeader.setAlignment(Pos.CENTER);
+		
+		HBox menubarBox = new HBox();
+		menubarBox.setStyle("-fx-background-color: #ACACD0;");
+		menubarBox.setPrefHeight(35);
+		menubarBox.setSpacing(110);
+		menubarBox.setAlignment(Pos.CENTER);
+		
+		//home button
+		Button homeBt = new Button("Home");
+		homeBt.setPrefSize(100, 35);
+		homeBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		homeBt.setWrapText(true);
+		homeBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(homeBt);
+		
+		homeBt.setOnAction(e -> {
+			menu();
+		});
+		
+		//view menu button
+		Button menuBt = new Button("Menu");
+		menuBt.setPrefSize(100, 35);
+		menuBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		menuBt.setWrapText(true);
+		menuBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(menuBt);
+		
+		menuBt.setOnAction(e -> {
+			//start(primaryStage);
+		});
+		
+		//about us button
+		Button aboutUsBt = new Button("About Us");
+		aboutUsBt.setPrefSize(100, 35);
+		aboutUsBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		aboutUsBt.setWrapText(true);
+		aboutUsBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(aboutUsBt);
+		
+		aboutUsBt.setOnAction(e -> {
+			//start(primaryStage);
+		});
+		
+		//contact us button
+		Button contactUsBt = new Button("Contact Us");
+		contactUsBt.setPrefSize(120, 35);
+		contactUsBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		contactUsBt.setWrapText(true);
+		contactUsBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(contactUsBt);
+		
+		contactUsBt.setOnAction(e -> {
+			//start(primaryStage);
+		});
+		
+		//cart button
+		Button cartBt = new Button("Cart");
+		cartBt.setPrefSize(100, 50);
+		cartBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		cartBt.setWrapText(true);
+		cartBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(cartBt);
+		
+		cartBt.setOnAction(e -> {
+			viewCart();
+		});
+		
+		menubarBox.getChildren().addAll(homeBt, menuBt, aboutUsBt, contactUsBt, cartBt);
+		
+		HBox promoBox = new HBox();
+		promoBox.setStyle("-fx-background-color: #FFF2BB;");
+		promoBox.setPrefHeight(30);
+		
+		VBox photoBox = new VBox();
+		ImageView pizza1 = new ImageView("Pizza1.png");
+		pizza1.setFitWidth(700);
+		pizza1.setFitHeight(400);
+		photoBox.getChildren().add(pizza1);
+		
+		Text dealsLabel = new Text("  OUT OF THIS " + "\nWORLD DEALS!");
+		dealsLabel.setFont(Font.font("Futura", FontWeight.BOLD, 40));
+		dealsLabel.setStroke(Color.RED);
+		dealsLabel.setStrokeWidth(2);
+		
+		Label datesLabel = new Label("Available 1 Dec - 15 Dec");
+		datesLabel.setFont(Font.font("Futura", FontWeight.NORMAL, 20));
+		
+		Button orderBt = new Button("ORDER NOW");
+		orderBt.setPrefSize(150, 40);
+		orderBt.setFont(Font.font("SansSerif", FontWeight.BOLD, 18));
+		orderBt.setWrapText(true);
+		orderBt.setStyle("-fx-background-color: #FF0606; -fx-text-fill: white; -fx-border-radius: 30px;"); 
+		ButtonHoverRed(orderBt);
+		
+		VBox dealsBox = new VBox();
+		dealsBox.setPrefWidth(390);
+		dealsBox.getChildren().addAll(dealsLabel, datesLabel, orderBt);
+		dealsBox.setAlignment(Pos.CENTER);
+		dealsBox.setSpacing(20);
+		
+		promoBox.getChildren().addAll(dealsBox, photoBox);
+		promoBox.setAlignment(Pos.CENTER);
+		
+		HBox choiceHeader = new HBox();
+		choiceHeader.setStyle("-fx-background-color: #ffffff;");
+		choiceHeader.setPrefHeight(40);
+		choiceHeader.setPadding(new Insets(20));
+		Text choiceLabel = new Text("Popular Orders");
+		choiceLabel.setFont(Font.font("Futura", FontWeight.BOLD, 20));
+		choiceHeader.getChildren().add(choiceLabel);
+		choiceHeader.setAlignment(Pos.CENTER_LEFT);
+		
+		ScrollPane choicesScroll = new ScrollPane();
+		choicesScroll.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
+		choicesScroll.setPrefHeight(330);
+		choicesScroll.setPrefWidth(700);
+		choicesScroll.setStyle("-fx-background-color: #ffffff;");
+		
+		HBox choices = new HBox();
+		choices.setStyle("-fx-background-color: #ffffff;");
+		//choices.setPrefHeight(300);
+		choices.setSpacing(30);
+		
+		String[] pizzaNames = {"Italian Olive", "Classic Pepperoni", "Italian Dream",
+				"Seafood Fiesta", "Cheezus", "Classy Prosciutto", "Mushroom Mania",
+				"Vegetarian's Choice", "Woody Oven", "Tomato Goodness", "Hawaiian Taste"};
+		
+		itemList = new ArrayList<>();
+		
+		itemList.add(new Pizza("ID000001", "Italian Olive", 20.00, "The Italian Olive is packed with classic toppings like black olives, mushrooms, sausages, and asparagus, paired with our signature white sauce.",
+				10, "Handmade Crust", "Regular", "White Sauce"));
+		
+		itemList.add(new Pizza("ID000002", "Classic Pepperoni", 25.90, "Made with top pepperoni and ingredients, the deliciousness of our classic pepperoni pizza will leave you wanting more!",
+				15, "New York Style", "Regular", "Tomato Sauce"));
+		
+		itemList.add(new Pizza("ID000003", "Italian Dream", 39.90, "This pizzeria classic will have you dreaming. Classic tomato sauce topped with mozzarella and basil leaves, and most importantly, out top secret spice and herb!",
+				7, "Handmade Crust", "Regular", "Tomato Sauce"));
+		
+		itemList.add(new Pizza("ID000004", "Seafood Fiesta", 40.60, "A seafood fiesta is your mouth as this pizza is packed with flavors and ingredients such as crab, tuna, shrimps, and garlic butter.",
+				17, "Handmade Crust", "Regular", "White Sauce"));
+		
+		itemList.add(new Pizza("ID000005", "Cheezus", 36.50, "Preach the god of cheese pizzas, Cheezus, made with top quality cheese, including parmesan, mozzarella, cheddar and provolone.",
+				8, "Handmade Crust", "Regular", "White Sauce"));
+		
+		itemList.add(new Pizza("ID000006", "Classy Prosciutto", 37.50, "Nothing classier and more delicious than our chef's choice, the prosciutto pizza!",
+				5, "Ultra Thin", "Regular", "Tomato Sauce"));
+		
+		itemList.add(new Pizza("ID000007", "Mushroom Mania", 25.50, "Creamy mushroom deliciousness.",
+				5, "New York Style", "Regular", "White Sauce"));
+		
+		itemList.add(new Pizza("ID000008", "Vegetarian's Choice", 31.20, "Our best choice if you are vegetarian or vegan!",
+				6, "Handmade Crust", "Regular", "Tomato Sauce"));
+		
+		itemList.add(new Pizza("ID000009", "Woody Oven", 23.10, "Healthy and tasty, try out our latest recipe!",
+				4, "New York Style", "Regular", "Tomato Sauce"));
+		
+		itemList.add(new Pizza("ID000010", "Tomato Goodness", 22.30, "Calling out all tomato lovers to try this out!",
+				8, "Handmade Crust", "Regular", "Tomato Sauce"));
+		
+		itemList.add(new Pizza("ID000011", "Hawaiian Taste", 25.40, "Aloha! Taste the goodness with our fan-favourite and chef-favourite hawaiian pizza!",
+				16, "New York Style", "Regular", "Tomato Sauce"));
+		
+		
+		for(int i = 0; i < pizzaNames.length; i++) {
+			
+			ImageView pizza = new ImageView("Pizza" + (i + 2) + ".png");
+			pizza.setFitWidth(150);
+			pizza.setFitHeight(155);
+			
+			Label pizzaLabel = new Label(pizzaNames[i]);
+			pizzaLabel.setPadding(new Insets(5));
+			pizzaLabel.setFont(Font.font("Futura", FontWeight.BOLD, 17));
+			
+			Button pizzaBt = new Button();
+			pizzaBt.setGraphic(pizza);
+			
+			pizzaBt.setOnMouseClicked(e -> {
+				
+			});
+			
+			Button addOrderBt = new Button("ADD TO ORDER");
+			addOrderBt.setPrefSize(150, 40);
+			addOrderBt.setFont(Font.font("SansSerif", FontWeight.BOLD, 15));
+			addOrderBt.setWrapText(true);
+			addOrderBt.setStyle("-fx-background-color: #FF0606; -fx-text-fill: white; -fx-border-radius: 30px;"); 
+			ButtonHoverRed(addOrderBt);
+			
+//			String pizzaName = pizzaNames[i];
+			
+//			orderNowBt.setOnAction(e -> {;
+//				cart.addItem(pizzaName);
+//				System.out.println(pizzaName + " added to cart. Cart now has: ");
+//				for (Item item : cart.getItems())
+//					 System.out.println(item.getItemName() + " - Quantity: " + item.getItemQuantity());
+//			});
+			
+			Button customizeBt = new Button("CUSTOMIZE");
+			customizeBt.setPrefSize(150, 40);
+			customizeBt.setFont(Font.font("SansSerif", FontWeight.BOLD, 15));
+			customizeBt.setWrapText(true);
+			customizeBt.setStyle("-fx-background-color: #1B339B;-fx-text-fill: white; -fx-border-radius: 30px;"); 
+			ButtonHoverBlue(customizeBt);
+			
+			customizeBt.setOnAction(e -> {
+				viewFood();
+			});
+			
+			VBox choice = new VBox();
+			choice.setPadding(new Insets(5));
+			choice.setSpacing(10);
+			choice.getChildren().addAll(pizza, pizzaLabel, addOrderBt, customizeBt);
+			choice.setAlignment(Pos.CENTER);
+			
+			choices.getChildren().addAll(choice);
+		}
+		
+		choicesScroll.setContent(choices);
+
+		HBox categoryHeader = new HBox();
+		categoryHeader.setStyle("-fx-background-color: #ffffff;");
+		categoryHeader.setPrefHeight(40);
+		categoryHeader.setPadding(new Insets(15));
+		Text categoryLabel = new Text("Categories");
+		categoryLabel.setFont(Font.font("Futura", FontWeight.BOLD, 20));
+		categoryHeader.getChildren().add(categoryLabel);
+		categoryHeader.setAlignment(Pos.CENTER_LEFT);
+		
+		ScrollPane categoryScroll = new ScrollPane();
+		categoryScroll.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
+		categoryScroll.setPrefHeight(330);
+		categoryScroll.setPrefWidth(700);
+		categoryScroll.setStyle("-fx-background-color: #ffffff;");
+		
+		HBox categoryBox = new HBox();
+		categoryBox.setStyle("-fx-background-color: #ffffff;");
+		categoryBox.setSpacing(40);
+		
+		String[] categoryNames = {"Promo", "New Recipes", "Meat Pizza", "Veg Pizza",
+				"Group Deals", "Chef's Choice", "Sides", "Drinks"};
+		
+		for(int i = 0; i < categoryNames.length; i++) {
+			Label catLabel = new Label(categoryNames[i]);
+			catLabel.setPadding(new Insets(10));
+			catLabel.setFont(Font.font("Futura", FontWeight.BOLD, 17));
+
+			ImageView category = new ImageView("Cat" + (i + 1) + ".png");
+			category.setFitWidth(175);
+			category.setFitHeight(245);
+			
+			VBox cat = new VBox();
+			cat.setPadding(new Insets(10));
+			cat.getChildren().addAll(catLabel, category);
+			cat.setAlignment(Pos.CENTER);
+			
+			categoryBox.getChildren().addAll(cat);
+		}
+		categoryScroll.setContent(categoryBox);
+		
+		VBox menuBox = new VBox();
+		menuBox.getChildren().addAll(logoHeader, menubarBox, promoBox, choiceHeader, choicesScroll, categoryHeader, categoryScroll);
+		
+		BorderPane menuPane = new BorderPane();
+		menuPane.setPadding(new Insets(10));
+		menuPane.setTop(menuBox);
+		
+		ScrollPane menuScroll = new ScrollPane();
+		menuScroll.setContent(menuBox); // Set menuBox as the scrollable content
+		menuScroll.setFitToWidth(true);
+		menuPane.setCenter(menuScroll);
+		
+		Scene menusc = new Scene(menuPane, 1100, 700);
+		primaryStage.setScene(menusc);
+	}
+ 	
+ 	private void viewFood() {
+ 		
+ 		//BorderPane root = new BorderPane();
+		//root.setStyle("-fx-background-color: #FFFFFF;");
+ 		
+ 		HBox logoHeader = new HBox();
+		logoHeader.setStyle("-fx-background-color: #1B339B;");
+		logoHeader.setPrefHeight(55);
+		logoHeader.setMinHeight(0);
+		ImageView logoView = new ImageView("PizzaPlanetLogo.png");
+		logoView.setFitWidth(110);
+		logoView.setFitHeight(110);
+		
+		logoHeader.getChildren().add(logoView);
+		logoHeader.setAlignment(Pos.CENTER);
+		
+		HBox menubarBox = new HBox();
+		menubarBox.setStyle("-fx-background-color: #ACACD0;");
+		menubarBox.setPrefHeight(35);
+		menubarBox.setSpacing(110);
+		menubarBox.setAlignment(Pos.CENTER);
+		
+		//home button
+		Button homeBt = new Button("Home");
+		homeBt.setPrefSize(100, 35);
+		homeBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		homeBt.setWrapText(true);
+		homeBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(homeBt);
+		
+		homeBt.setOnAction(e -> {
+			menu();
+		});
+		
+		//view menu button
+		Button menuBt = new Button("Menu");
+		menuBt.setPrefSize(100, 35);
+		menuBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		menuBt.setWrapText(true);
+		menuBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(menuBt);
+		
+		menuBt.setOnAction(e -> {
+			//start(primaryStage);
+		});
+		
+		//about us button
+		Button aboutUsBt = new Button("About Us");
+		aboutUsBt.setPrefSize(100, 35);
+		aboutUsBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		aboutUsBt.setWrapText(true);
+		aboutUsBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(aboutUsBt);
+		
+		aboutUsBt.setOnAction(e -> {
+			//start(primaryStage);
+		});
+		
+		//contact us button
+		Button contactUsBt = new Button("Contact Us");
+		contactUsBt.setPrefSize(120, 35);
+		contactUsBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		contactUsBt.setWrapText(true);
+		contactUsBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(contactUsBt);
+		
+		contactUsBt.setOnAction(e -> {
+			//start(primaryStage);
+		});
+		
+		//cart button
+		Button cartBt = new Button("Cart");
+		cartBt.setPrefSize(100, 50);
+		cartBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		cartBt.setWrapText(true);
+		cartBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(cartBt);
+		
+		cartBt.setOnAction(e -> {
+			viewCart();
+		});
+		
+		menubarBox.getChildren().addAll(homeBt, menuBt, aboutUsBt, contactUsBt, cartBt);
+	
+		//VBox on the left side to store image and description
+		VBox leftVBox = new VBox();
+		leftVBox.setPrefWidth(320); // Set the preferred width for the left region
+		leftVBox.setStyle("-fx-background-color: #FFFFFF;");
+		
+		//image
+		HBox pizzaImageBox = new HBox();
+		pizzaImageBox.setAlignment(Pos.CENTER); // Center the pizza image
+		ImageView pizza = new ImageView("Pizza2.png");
+		pizza.setFitWidth(320);
+		pizza.setFitHeight(320);
+		pizzaImageBox.getChildren().add(pizza);
+		
+		//description
+		Text description = new Text("The Italian Olive is packed with classic "
+		+ "\ntoppings like black olives, mushrooms, "
+		+ "\nsausages, and asparagus, paired with "
+		+ "\nour signature white sauce.");
+		description.setFont(Font.font("Futura", FontWeight.NORMAL, 20));
+		description.setLineSpacing(5);
+		
+		//leftVBox
+		leftVBox.setStyle("-fx-background-color: #FFFFFF;");
+		leftVBox.setAlignment(Pos.CENTER_LEFT); 
+		leftVBox.setPadding(new Insets(20));
+		leftVBox.getChildren().addAll(pizzaImageBox, description);
+		
+		//store everything on the right side
+		VBox everythingBox = new VBox();
+		everythingBox.setPadding(new Insets(20));
+		everythingBox.setStyle("-fx-background-color: #FFFFFF;");
+		
+		//HBox to store radio button selection -> size, crust, sauce
+		HBox radioChoiceHBox = new HBox();
+		radioChoiceHBox.setSpacing(20);
+		
+		//to store title name of pizza
+		HBox headerBox = new HBox();
+		Text header = new Text("  Italian Olive");
+		header.setFont(Font.font("Futura", FontWeight.BOLD, 25));
+		headerBox.getChildren().add(header);
+		
+		//pizza size
+		Text pSize = new Text("Pizza size:");
+		pSize.setFont(Font.font("Futura", FontWeight.NORMAL, 20));
+		
+		//VBox for radio buttons
+		VBox sizeRadiobuttonPane = new VBox(20);
+		sizeRadiobuttonPane.setPadding(new Insets(20));
+		RadioButton rbLarge = new RadioButton("Large   RM30.00");
+		RadioButton rbRegular = new RadioButton("Regular   RM20.00");
+		RadioButton rbSmall = new RadioButton("Small   RM10.00");
+		sizeRadiobuttonPane.getChildren().addAll(pSize, rbLarge, rbRegular, rbSmall);
+		
+		rbLarge.setSelected(true);
+		
+		//allow only 1 radio button to be selected
+		ToggleGroup sizegroup = new ToggleGroup();
+		rbLarge.setToggleGroup(sizegroup);
+		rbRegular.setToggleGroup(sizegroup);
+		rbSmall.setToggleGroup(sizegroup);
+		
+		
+		//pizza crust
+		Text pCrust = new Text("Crust choice:");
+		pCrust.setFont(Font.font("Futura", FontWeight.NORMAL, 20));
+		
+		//VBox for radio buttons
+		VBox crustRadiobuttonPane = new VBox(20);
+		crustRadiobuttonPane.setPadding(new Insets(20));
+		RadioButton rbHandmade = new RadioButton("Handmade Crust");
+		RadioButton rbNewYork = new RadioButton("New York Style");
+		RadioButton rbThin = new RadioButton("Ultra Thin");
+		crustRadiobuttonPane.getChildren().addAll(pCrust, rbHandmade, rbNewYork, rbThin);
+		
+		rbHandmade.setSelected(true);
+		
+		//allow only 1 radio button to be selected
+		ToggleGroup crustgroup = new ToggleGroup();
+		rbHandmade.setToggleGroup(crustgroup);
+		rbNewYork.setToggleGroup(crustgroup);
+		rbThin.setToggleGroup(crustgroup);
+
+		
+		//pizza sauce
+		Text pSauce = new Text("Sauce choice:");
+		pSauce.setFont(Font.font("Futura", FontWeight.NORMAL, 20));
+		
+		//VBox for radio buttons
+		VBox sauceRadiobuttonPane = new VBox(20);
+		sauceRadiobuttonPane.setPadding(new Insets(20));
+		RadioButton rbTomato = new RadioButton("Tomato");
+		RadioButton rbWhiteSauce = new RadioButton("White Sauce");
+		RadioButton rbSpecialSauce = new RadioButton("Special Sauce  +RM2.00");
+		sauceRadiobuttonPane.getChildren().addAll(pSauce, rbTomato, rbWhiteSauce, rbSpecialSauce);
+		
+		rbTomato.setSelected(true);
+		
+		//allow only 1 radio button to be selected
+		ToggleGroup saucegroup = new ToggleGroup();
+		rbTomato.setToggleGroup(saucegroup);
+		rbWhiteSauce.setToggleGroup(saucegroup);
+		rbSpecialSauce.setToggleGroup(saucegroup);
+		
+		//HBox to store text
+		HBox subtitle = new HBox();
+		Text pToppings = new Text("   Extra Toppings:");
+		pToppings.setFont(Font.font("Futura", FontWeight.NORMAL, 20));
+		subtitle.getChildren().add(pToppings);
+		
+		//HBox for check box selection
+		HBox checkboxHBox = new HBox(10);
+		checkboxHBox.setPadding(new Insets(30));
+		
+		//VBox for left side check boxes
+		VBox checkBoxesLeft = new VBox(20);
+		
+		//VBox for right side check boxes
+		VBox checkBoxesRight = new VBox(20);
+		
+		//check box
+		CheckBox chkCheese = new CheckBox("Cheese   +RM3.00");
+		CheckBox chkOnion = new CheckBox("Onion   +RM1.50");
+		CheckBox chkOlive = new CheckBox("Olives   +RM2.50");
+		CheckBox chkBeefPepperoni = new CheckBox("Beef Pepperoni   +RM3.00");
+		
+		checkBoxesLeft.getChildren().addAll(chkCheese, chkOnion, chkOlive, chkBeefPepperoni);
+		
+		CheckBox chkChickenPepperoni = new CheckBox("Chicken Pepperoni   +RM2.90");
+		CheckBox chkPineapple = new CheckBox("Pineapple   +RM1.50");
+		CheckBox chkMushroom = new CheckBox("Mushroom   +RM2.00");
+		CheckBox chkBellPepper = new CheckBox("Bell Pepper   +RM2.00");
+		
+		checkBoxesRight.getChildren().addAll(chkChickenPepperoni, chkPineapple, chkMushroom, chkBellPepper);
+		
+		//add radio button selections
+		radioChoiceHBox.getChildren().addAll(sizeRadiobuttonPane, crustRadiobuttonPane, sauceRadiobuttonPane);
+		
+		//add check box selections
+		checkboxHBox.getChildren().addAll(checkBoxesLeft, checkBoxesRight);
+		
+		//to store the order button
+		HBox addOrderBox = new HBox();
+		addOrderBox.setPadding(new Insets(20));
+		addOrderBox.setStyle("-fx-background-color: #FFFFFF;");
+		Button orderNowBt = new Button("ADD TO ORDER");
+		orderNowBt.setPrefSize(150, 40);
+		orderNowBt.setFont(Font.font("SansSerif", FontWeight.BOLD, 15));
+		orderNowBt.setWrapText(true);
+		orderNowBt.setStyle("-fx-background-color: #FF0606; -fx-text-fill: white; -fx-border-radius: 30px;"); 
+		ButtonHoverRed(orderNowBt);
+		addOrderBox.getChildren().add(orderNowBt);
+		addOrderBox.setAlignment(Pos.BASELINE_RIGHT);
+		
+		//add everything
+		everythingBox.getChildren().addAll(headerBox, radioChoiceHBox, subtitle, checkboxHBox);
+		
+		VBox cartBox = new VBox();
+		cartBox.getChildren().addAll(logoHeader, menubarBox);
+		
+		BorderPane menuPane = new BorderPane();
+		menuPane.setPadding(new Insets(10));
+		menuPane.setTop(cartBox);
+		menuPane.setLeft(leftVBox);
+		menuPane.setCenter(everythingBox);
+		menuPane.setBottom(addOrderBox);
+		
+		Scene menusc = new Scene(menuPane, 1100, 700);
+		primaryStage.setScene(menusc);
+ 	}
+ 	
+ 	private void viewCart() {
+ 		
+ 		HBox logoHeader = new HBox();
+		logoHeader.setStyle("-fx-background-color: #1B339B;");
+		logoHeader.setPrefHeight(55);
+		logoHeader.setMinHeight(0);
+		ImageView logoView = new ImageView("PizzaPlanetLogo.png");
+		logoView.setFitWidth(110);
+		logoView.setFitHeight(110);
+		
+		logoHeader.getChildren().add(logoView);
+		logoHeader.setAlignment(Pos.CENTER);
+		
+		HBox menubarBox = new HBox();
+		menubarBox.setStyle("-fx-background-color: #ACACD0;");
+		menubarBox.setPrefHeight(35);
+		menubarBox.setSpacing(110);
+		menubarBox.setAlignment(Pos.CENTER);
+		
+		//home button
+		Button homeBt = new Button("Home");
+		homeBt.setPrefSize(100, 35);
+		homeBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		homeBt.setWrapText(true);
+		homeBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(homeBt);
+		
+		homeBt.setOnAction(e -> {
+			menu();
+		});
+		
+		//view menu button
+		Button menuBt = new Button("Menu");
+		menuBt.setPrefSize(100, 35);
+		menuBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		menuBt.setWrapText(true);
+		menuBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(menuBt);
+		
+		menuBt.setOnAction(e -> {
+			//start(primaryStage);
+		});
+		
+		//about us button
+		Button aboutUsBt = new Button("About Us");
+		aboutUsBt.setPrefSize(100, 35);
+		aboutUsBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		aboutUsBt.setWrapText(true);
+		aboutUsBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(aboutUsBt);
+		
+		aboutUsBt.setOnAction(e -> {
+			//start(primaryStage);
+		});
+		
+		//contact us button
+		Button contactUsBt = new Button("Contact Us");
+		contactUsBt.setPrefSize(120, 35);
+		contactUsBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		contactUsBt.setWrapText(true);
+		contactUsBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(contactUsBt);
+		
+		contactUsBt.setOnAction(e -> {
+			//start(primaryStage);
+		});
+		
+		//cart button
+		Button cartBt = new Button("Cart");
+		cartBt.setPrefSize(100, 50);
+		cartBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		cartBt.setWrapText(true);
+		cartBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(cartBt);
+		
+		cartBt.setOnAction(e -> {
+			viewCart();
+		});
+		
+		menubarBox.getChildren().addAll(homeBt, menuBt, aboutUsBt, contactUsBt, cartBt);
+		
+		HBox displayBox = new HBox();
+		displayBox.setStyle("-fx-background-color: #FFFFFF;");
+		displayBox.setPrefHeight(30);
+		
+//		List<Item> items = cart.getItems();
+//		if(items.isEmpty()) {
+//			displayBox.getChildren().add(new Label("Your cart is empty"));
+//		}
+//		else {
+//			for(Item item : items) {
+//				Label cartItems = new Label(item.getItemName() + " - Quantity: " + item.getItemQuantity());
+//				
+//				displayBox.getChildren().add(cartItems);
+//			}
+//		}
+		
+		VBox cartBox = new VBox();
+		cartBox.getChildren().addAll(logoHeader, menubarBox, displayBox);
+		
+		BorderPane menuPane = new BorderPane();
+		menuPane.setPadding(new Insets(10));
+		menuPane.setTop(cartBox);
+		
+		ScrollPane menuScroll = new ScrollPane();
+		menuScroll.setContent(cartBox); // Set menuBox as the scrollable content
+		menuScroll.setFitToWidth(true);
+		menuPane.setCenter(menuScroll);
+		
+		Scene menusc = new Scene(menuPane, 1100, 700);
+		primaryStage.setScene(menusc);
+ 		
+ 	}
+	
+	private void ButtonHoverBlue(Button button) {
+		button.setOnMouseEntered(e ->button.setStyle("-fx-background-color: #162773; -fx-text-fill: #FFBD59;"));
+        button.setOnMouseExited(e ->button.setStyle("-fx-background-color: #1B339B;-fx-text-fill: white;"));
+	}
+	
+	private void ButtonHoverRed(Button button) {
+		button.setOnMouseEntered(e ->button.setStyle("-fx-background-color: #bd0606; -fx-text-fill: #FFBD59;"));
+        button.setOnMouseExited(e ->button.setStyle("-fx-background-color: #FF0606;-fx-text-fill: white;"));
+	}
+	
+	private void ButtonHoverPurple(Button button) {
+		button.setOnMouseEntered(e ->button.setStyle("-fx-background-color: #6D6DBD;"));
+		button.setOnMouseExited(e ->button.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black; -fx-border-radius: 30px;"));
+	}
+	
+	private void HyperlinkHoverBlue(Hyperlink link) {
+		link.setOnMouseEntered(e -> link.setTextFill(Color.CYAN));
+		link.setOnMouseExited(e -> link.setTextFill(Color.BLUE));
+	}
+	
+	public static void main(String[] args) throws SQLException, ClassNotFoundException {
+		
+		launch(args);
+	}
+
+}
+
