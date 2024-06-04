@@ -3,8 +3,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -18,6 +19,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
@@ -297,6 +299,16 @@ public class Login extends Application{
 		CpasswordBox.setPrefWidth(500);
 		CpasswordBox.getChildren().addAll(CpasswordLabel, CpasswordTf);
 		
+		//address field
+		Label addressLabel = new Label("Address:                ");
+		TextArea addressTa = new TextArea();
+		addressTa.setPromptText("Enter your default address");
+		addressTa.setPrefSize(300,  130);
+				
+		HBox addressBox = new HBox(20); 
+		addressBox.setPrefWidth(500);
+		addressBox.getChildren().addAll(addressLabel, addressTa);
+				
 		//move on to last name field after first name done and hit ENTER
 		firstnameTf.setOnKeyPressed(e -> {
 			if(e.getCode() == KeyCode.ENTER) {
@@ -331,21 +343,28 @@ public class Login extends Application{
 				CpasswordTf.requestFocus();
 			}
 		});		
+
+		//move on to address field after confirm password done and hit ENTER
+		CpasswordTf.setOnKeyPressed(e -> {
+			if(e.getCode() == KeyCode.ENTER) {
+				addressTa.requestFocus();
+			}
+		});
 		
 		HBox messageBox = new HBox();
 		Label message = new Label();
 		messageBox.getChildren().add(message);
 		messageBox.setAlignment(Pos.CENTER);
 		
-		//Login button
+		//sign up button
 		Button signupBt = new Button("Sign Up");
 		signupBt.setPrefSize(150, 40);
 		signupBt.setStyle("-fx-background-color: #1B339B; -fx-text-fill: white;"); 
 		ButtonHoverBlue(signupBt);
 		
-		signupBt.setOnAction(e -> processSignup(firstnameTf, lastnameTf, emailTf, phoneNoTf, passwordTf, CpasswordTf, message));
+		signupBt.setOnAction(e -> processSignup(firstnameTf, lastnameTf, emailTf, phoneNoTf, passwordTf, CpasswordTf, addressTa, message));
 		
-		CpasswordTf.setOnAction(e -> signupBt.fire());
+		//addressTa.setOnKeyPressed(e -> signupBt.fire());
 		
 		HBox question2 = new HBox();
 		Text login = new Text("Already have an account? ");
@@ -363,7 +382,7 @@ public class Login extends Application{
 		VBox inputBox = new VBox(30);
 		inputBox.setAlignment(Pos.CENTER);
 		inputBox.getChildren().addAll( firstnameBox, lastnameBox, emailBox, 
-				phoneNoBox, passwordBox, CpasswordBox, signupBt, question2, messageBox);
+				phoneNoBox, passwordBox, CpasswordBox, addressBox, signupBt, question2, messageBox);
 
         vb2.getChildren().addAll(headerBox, inputBox); // Use the modified stackPane
         vb2.setAlignment(Pos.CENTER);
@@ -409,8 +428,8 @@ public class Login extends Application{
         return false;
     }
 	
-	private void createUser(String firstname, String lastname, String password, String email, String phoneNo) {
-		String query = "INSERT INTO Customer(firstname, lastname, password, email, phoneNo) VALUES (?, ?, ?, ?, ?)";
+	private void createUser(String firstname, String lastname, String password, String email, String phoneNo, String address) {
+		String query = "INSERT INTO Customer(firstname, lastname, password, email, phoneNo, address) VALUES (?, ?, ?, ?, ?, ?)";
 		
 		try(Connection connection  = DriverManager.getConnection("jdbc:ucanaccess://C://Users//Charmaine Hooi//Downloads//PizzaPlanetDB.accdb")){
 			PreparedStatement stat = connection.prepareStatement(query);
@@ -420,8 +439,9 @@ public class Login extends Application{
 	        stat.setString(3, password);
 	        stat.setString(4, email);
 	        stat.setString(5,  phoneNo);
+	        stat.setString(6,  address);
 	        stat.executeUpdate();
-	        
+	    
 	        System.out.println("User created: " + firstname + " " + lastname);
 	        
 		}catch(SQLException ex) {
@@ -439,13 +459,14 @@ public class Login extends Application{
 	}
 	
 	private void processSignup(TextField firstnameTf, TextField lastnameTf, TextField emailTf,
-			TextField phoneNoTf, TextField passwordTf, TextField CpasswordTf, Label message) {
+			TextField phoneNoTf, TextField passwordTf, TextField CpasswordTf, TextArea addressTa, Label message) {
 		String firstname = firstnameTf.getText();
 		String lastname = lastnameTf.getText();
 		String email = emailTf.getText();
 		String phoneNo = phoneNoTf.getText();
 		String password = passwordTf.getText();
 		String Cpassword = CpasswordTf.getText();
+		String address = addressTa.getText();
 		
 		if(userExists(email)) {
 			message.setText("Email already exists!");
@@ -454,7 +475,7 @@ public class Login extends Application{
 		else {
 			if(checkPasswordLength(passwordTf, message)) {
 					if(password.equals(Cpassword)) {
-						createUser(firstname, lastname, password, email, phoneNo);
+						createUser(firstname, lastname, password, email, phoneNo, address);
 						System.out.println("Account created successfully!");
 						start(primaryStage);
 					}
