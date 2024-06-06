@@ -3,14 +3,14 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.UUID;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
@@ -647,51 +647,52 @@ public class Login extends Application{
 		itemList = new ArrayList<>();
 		
 		itemList.add(new Pizza("ID000001", "Italian Olive", 20.00, "The Italian Olive is packed with classic toppings like black olives, mushrooms, sausages, and asparagus, paired with our signature white sauce.",
-				10, "Handmade Crust", "Regular", "White Sauce"));
+				10, 0, "Handmade Crust", "Regular", "White Sauce"));
 		
 		itemList.add(new Pizza("ID000002", "Classic Pepperoni", 25.90, "Made with top pepperoni and ingredients, the deliciousness of our classic pepperoni pizza will leave you wanting more!",
-				15, "New York Style", "Regular", "Tomato Sauce"));
+				15, 0, "New York Style", "Regular", "Tomato Sauce"));
 		
 		itemList.add(new Pizza("ID000003", "Italian Dream", 39.90, "This pizzeria classic will have you dreaming. Classic tomato sauce topped with mozzarella and basil leaves, and most importantly, out top secret spice and herb!",
-				7, "Handmade Crust", "Regular", "Tomato Sauce"));
+				7, 0, "Handmade Crust", "Regular", "Tomato Sauce"));
 		
 		itemList.add(new Pizza("ID000004", "Seafood Fiesta", 40.60, "A seafood fiesta is your mouth as this pizza is packed with flavors and ingredients such as crab, tuna, shrimps, and garlic butter.",
-				17, "Handmade Crust", "Regular", "White Sauce"));
+				17, 0, "Handmade Crust", "Regular", "White Sauce"));
 		
 		itemList.add(new Pizza("ID000005", "Cheezus", 36.50, "Preach the god of cheese pizzas, Cheezus, made with top quality cheese, including parmesan, mozzarella, cheddar and provolone.",
-				8, "Handmade Crust", "Regular", "White Sauce"));
+				8, 0, "Handmade Crust", "Regular", "White Sauce"));
 		
 		itemList.add(new Pizza("ID000006", "Classy Prosciutto", 37.50, "Nothing classier and more delicious than our chef's choice, the prosciutto pizza!",
-				5, "Ultra Thin", "Regular", "Tomato Sauce"));
+				5, 0, "Ultra Thin", "Regular", "Tomato Sauce"));
 		
 		itemList.add(new Pizza("ID000007", "Mushroom Mania", 25.50, "Creamy mushroom deliciousness.",
-				5, "New York Style", "Regular", "White Sauce"));
+				5, 0, "New York Style", "Regular", "White Sauce"));
 		
 		itemList.add(new Pizza("ID000008", "Vegetarian's Choice", 31.20, "Our best choice if you are vegetarian or vegan!",
-				6, "Handmade Crust", "Regular", "Tomato Sauce"));
+				6, 0, "Handmade Crust", "Regular", "Tomato Sauce"));
 		
 		itemList.add(new Pizza("ID000009", "Woody Oven", 23.10, "Healthy and tasty, try out our latest recipe!",
-				4, "New York Style", "Regular", "Tomato Sauce"));
+				4, 0, "New York Style", "Regular", "Tomato Sauce"));
 		
 		itemList.add(new Pizza("ID000010", "Tomato Goodness", 22.30, "Calling out all tomato lovers to try this out!",
-				8, "Handmade Crust", "Regular", "Tomato Sauce"));
+				8, 0, "Handmade Crust", "Regular", "Tomato Sauce"));
 		
 		itemList.add(new Pizza("ID000011", "Hawaiian Taste", 25.40, "Aloha! Taste the goodness with our fan-favourite and chef-favourite hawaiian pizza!",
-				16, "New York Style", "Regular", "Tomato Sauce"));
+				16, 0, "New York Style", "Regular", "Tomato Sauce"));
 		
 		
 		for(int i = 0; i < pizzaNames.length; i++) {
+			final Pizza pizza = (Pizza)itemList.get(i);
 			
-			ImageView pizza = new ImageView("Pizza" + (i + 2) + ".png");
-			pizza.setFitWidth(150);
-			pizza.setFitHeight(155);
+			ImageView pizzaImg = new ImageView("Pizza" + (i + 2) + ".png");
+			pizzaImg.setFitWidth(150);
+			pizzaImg.setFitHeight(155);
 			
 			Label pizzaLabel = new Label(pizzaNames[i]);
 			pizzaLabel.setPadding(new Insets(5));
 			pizzaLabel.setFont(Font.font("Futura", FontWeight.BOLD, 17));
 			
 			Button pizzaBt = new Button();
-			pizzaBt.setGraphic(pizza);
+			pizzaBt.setGraphic(pizzaImg);
 			
 			pizzaBt.setOnMouseClicked(e -> {
 				
@@ -704,15 +705,11 @@ public class Login extends Application{
 			addOrderBt.setStyle("-fx-background-color: #FF0606; -fx-text-fill: white; -fx-border-radius: 30px;"); 
 			ButtonHoverRed(addOrderBt);
 			
-//			String pizzaName = pizzaNames[i];
-			
-//			orderNowBt.setOnAction(e -> {;
-//				cart.addItem(pizzaName);
-//				System.out.println(pizzaName + " added to cart. Cart now has: ");
-//				for (Item item : cart.getItems())
-//					 System.out.println(item.getItemName() + " - Quantity: " + item.getItemQuantity());
-//			});
-			
+			//add to cart 
+			addOrderBt.setOnAction(e ->{			
+				addToCart(pizza);
+			});
+
 			Button customizeBt = new Button("CUSTOMIZE");
 			customizeBt.setPrefSize(150, 40);
 			customizeBt.setFont(Font.font("SansSerif", FontWeight.BOLD, 15));
@@ -727,7 +724,7 @@ public class Login extends Application{
 			VBox choice = new VBox();
 			choice.setPadding(new Insets(5));
 			choice.setSpacing(10);
-			choice.getChildren().addAll(pizza, pizzaLabel, addOrderBt, customizeBt);
+			choice.getChildren().addAll(pizzaImg, pizzaLabel, addOrderBt, customizeBt);
 			choice.setAlignment(Pos.CENTER);
 			
 			choices.getChildren().addAll(choice);
@@ -790,6 +787,33 @@ public class Login extends Application{
 		Scene menusc = new Scene(menuPane, 1100, 700);
 		primaryStage.setScene(menusc);
 	}
+ 	
+ 	private void addToCart(Pizza pizza) {
+		
+		boolean foundInCart = false;
+	    for (Item itemInCart : cart.getItems()) {
+	        if (itemInCart.getItemName().equals(pizza.getItemName())) {
+	          itemInCart.incrementQuantity();
+	          foundInCart = true;
+	          break;
+	        }
+	    }
+
+	    if (!foundInCart) {
+	      Item item = new Item(pizza.getItemName());
+	      item.setItemPrice(pizza.getItemPrice());
+	      item.setItemDesc(pizza.getItemDesc());
+	      item.setItemQuantity(1);
+	      cart.addItem(item);
+	    }
+	   
+		
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("Success");
+		alert.setHeaderText("Item added to cart");
+		alert.setContentText("You have successfully added the item to cart!");
+		alert.showAndWait(); 		
+ 	}
  	
  	private void viewFood() {
  		
@@ -1127,21 +1151,38 @@ public class Login extends Application{
 		
 		menubarBox.getChildren().addAll(homeBt, menuBt, aboutUsBt, contactUsBt, cartBt);
 		
-		HBox displayBox = new HBox();
+		VBox displayBox = new VBox();
 		displayBox.setStyle("-fx-background-color: #FFFFFF;");
-		displayBox.setPrefHeight(30);
+		displayBox.setPrefHeight(600);
 		
-//		List<Item> items = cart.getItems();
-//		if(items.isEmpty()) {
-//			displayBox.getChildren().add(new Label("Your cart is empty"));
-//		}
-//		else {
-//			for(Item item : items) {
-//				Label cartItems = new Label(item.getItemName() + " - Quantity: " + item.getItemQuantity());
-//				
-//				displayBox.getChildren().add(cartItems);
-//			}
-//		}
+
+		//display list of items in cart
+	    for (final Item item : cart.getItems()) {
+
+	        HBox itemBox = new HBox();
+	        itemBox.setSpacing(10);
+
+	        Label cartItem = new Label(item.getItemName() + " - Quantity: " + item.getItemQuantity());
+	        cartItem.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+
+	        Button incrementBt = new Button("+");
+	        incrementBt.setOnAction(e -> {
+	            item.incrementQuantity();
+	            cartItem.setText(item.getItemName() + " - Quantity: " + item.getItemQuantity());
+	        });
+
+	        Button decrementBt = new Button("-");
+	        decrementBt.setOnAction(e -> {
+	            item.decrementQuantity();
+	            if(item.getItemQuantity() <=0) {
+	            	cart.removeItem(item);
+	            }
+	            cartItem.setText(item.getItemName() + " - Quantity: " + item.getItemQuantity());
+	        });
+	        
+	        itemBox.getChildren().addAll(cartItem, incrementBt, decrementBt);
+	        displayBox.getChildren().add(itemBox);
+	    }
 		
 		VBox cartBox = new VBox();
 		cartBox.getChildren().addAll(logoHeader, menubarBox, displayBox);
