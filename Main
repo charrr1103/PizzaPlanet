@@ -33,6 +33,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
 public class Login extends Application{
@@ -40,7 +42,9 @@ public class Login extends Application{
 	private Stage primaryStage;
 	private static ArrayList<Item> itemList;
 	public static List<Item> cartList = new ArrayList<>();
-
+	public double totalPrice = 0;
+	public double pizzaPrice = 0;
+	
 	@Override
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
@@ -631,7 +635,7 @@ public class Login extends Application{
 		
 		ScrollPane choicesScroll = new ScrollPane();
 		choicesScroll.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
-		choicesScroll.setPrefHeight(360);
+		choicesScroll.setPrefHeight(362);
 		choicesScroll.setPrefWidth(700);
 		choicesScroll.setStyle("-fx-background-color: #ffffff;");
 		
@@ -647,13 +651,13 @@ public class Login extends Application{
 		
 		itemList = new ArrayList<>();
 		
-		itemList.add(new Pizza("ID000001", "Italian Olive", 20.00, "The Italian Olive is packed with classic toppings like black olives, mushrooms, sausages, and asparagus, paired with our signature white sauce.",
+		itemList.add(new Pizza("ID000001", "Italian Olive", 20.00, "The Italian Olive is packed with classic toppings, paired with our signature white sauce.",
 		        10, 0, "Pizza2.png", "Handmade Crust", "Regular", "White Sauce"));
 
 		itemList.add(new Pizza("ID000002", "Classic Pepperoni", 25.90, "Made with top pepperoni and ingredients, the deliciousness of our classic pepperoni pizza will leave you wanting more!",
 		        15, 0, "Pizza3.png", "New York Style", "Regular", "Tomato Sauce"));
 
-		itemList.add(new Pizza("ID000003", "Italian Dream", 39.90, "This pizzeria classic will have you dreaming. Classic tomato sauce topped with mozzarella and basil leaves, and most importantly, out top secret spice and herb!",
+		itemList.add(new Pizza("ID000003", "Italian Dream", 39.90, "This pizzeria classic will have you dreaming. Classic tomato sauce topped with mozzarella and basil leaves!",
 		        7, 0, "Pizza4.png", "Handmade Crust", "Regular", "Tomato Sauce"));
 
 		itemList.add(new Pizza("ID000004", "Seafood Fiesta", 40.60, "A seafood fiesta is your mouth as this pizza is packed with flavors and ingredients such as crab, tuna, shrimps, and garlic butter.",
@@ -695,7 +699,7 @@ public class Login extends Application{
 			pizzaBt.setGraphic(pizzaImg);
 			
 			pizzaBt.setOnMouseClicked(e -> {
-				customize();
+			    customize(pizza);
 			});
 			
 			Label pizzaPrice = new Label(String.format("RM %.2f", pizzaPrices[i]));
@@ -722,7 +726,7 @@ public class Login extends Application{
 			ButtonHoverBlue(customizeBt);
 			
 			customizeBt.setOnAction(e -> {
-				customize();
+			    customize(pizza);
 			});
 			
 			VBox choice = new VBox();
@@ -810,7 +814,6 @@ public class Login extends Application{
 	      item.setItemQuantity(1);
 	      item.setItemImagePath(pizza.getItemImagePath());
 	      cartList.add(item);
-	      //cart.addItem(item);
 	    }
 	   
 		
@@ -821,10 +824,12 @@ public class Login extends Application{
 		alert.showAndWait(); 		
  	}
  	
- 	private void customize() {
+ 	private void customize(Pizza pizza) {
  		
  		//BorderPane root = new BorderPane();
 		//root.setStyle("-fx-background-color: #FFFFFF;");
+ 		
+ 		
  		
  		HBox logoHeader = new HBox();
 		logoHeader.setStyle("-fx-background-color: #1B339B;");
@@ -913,24 +918,29 @@ public class Login extends Application{
 		//image
 		HBox pizzaImageBox = new HBox();
 		pizzaImageBox.setAlignment(Pos.CENTER); // Center the pizza image
-		ImageView pizza = new ImageView("Pizza2.png");
-		pizza.setFitWidth(320);
-		pizza.setFitHeight(320);
-		pizzaImageBox.getChildren().add(pizza);
+		ImageView pizzaImg = new ImageView(pizza.getItemImagePath());
+		pizzaImg.setFitWidth(320);
+		pizzaImg.setFitHeight(320);
+		pizzaImageBox.getChildren().add(pizzaImg);
 		
-		//description
-		Text description = new Text("The Italian Olive is packed with classic "
-		+ "\ntoppings like black olives, mushrooms, "
-		+ "\nsausages, and asparagus, paired with "
-		+ "\nour signature white sauce.");
-		description.setFont(Font.font("Futura", FontWeight.NORMAL, 20));
-		description.setLineSpacing(5);
+		//description that is flexible
+		TextFlow descriptionFlow = new TextFlow();
+		descriptionFlow.setLineSpacing(10); // Set the line spacing
+		descriptionFlow.setMaxWidth(320); // Set the maximum width
+		descriptionFlow.setTextAlignment(TextAlignment.JUSTIFY); // Set the text alignment to justify
+		descriptionFlow.setPadding(new Insets(10));
+		
+		Text text = new Text(pizza.getItemDesc());
+		text.setWrappingWidth(320); // Set the wrapping width
+		text.setFont(Font.font("Futura", FontWeight.NORMAL, 20));
+		text.setLineSpacing(5);
+		descriptionFlow.getChildren().add(text);
 		
 		//leftVBox
 		leftVBox.setStyle("-fx-background-color: #FFFFFF;");
 		leftVBox.setAlignment(Pos.CENTER_LEFT); 
 		leftVBox.setPadding(new Insets(20));
-		leftVBox.getChildren().addAll(pizzaImageBox, description);
+		leftVBox.getChildren().addAll(pizzaImageBox, descriptionFlow);
 		
 		//store everything on the right side
 		VBox everythingBox = new VBox();
@@ -943,7 +953,7 @@ public class Login extends Application{
 		
 		//to store title name of pizza
 		HBox headerBox = new HBox();
-		Text header = new Text("  Italian Olive");
+		Text header = new Text("  " + pizza.getItemName());
 		header.setFont(Font.font("Futura", FontWeight.BOLD, 25));
 		headerBox.getChildren().add(header);
 		
@@ -954,9 +964,9 @@ public class Login extends Application{
 		//VBox for radio buttons
 		VBox sizeRadiobuttonPane = new VBox(20);
 		sizeRadiobuttonPane.setPadding(new Insets(20));
-		RadioButton rbLarge = new RadioButton("Large   RM30.00");
-		RadioButton rbRegular = new RadioButton("Regular   RM20.00");
-		RadioButton rbSmall = new RadioButton("Small   RM10.00");
+		RadioButton rbLarge = new RadioButton("Large   RM" + String.format("%.2f", pizza.calLargePrice(pizza.getItemPrice())));
+		RadioButton rbRegular = new RadioButton("Regular   RM" + String.format("%.2f", pizza.getItemPrice()));
+		RadioButton rbSmall = new RadioButton("Small   RM" + String.format("%.2f", pizza.calSmallPrice(pizza.getItemPrice())));
 		sizeRadiobuttonPane.getChildren().addAll(pSize, rbLarge, rbRegular, rbSmall);
 		
 		rbLarge.setSelected(true);
@@ -966,7 +976,6 @@ public class Login extends Application{
 		rbLarge.setToggleGroup(sizegroup);
 		rbRegular.setToggleGroup(sizegroup);
 		rbSmall.setToggleGroup(sizegroup);
-		
 		
 		//pizza crust
 		Text pCrust = new Text("Crust choice:");
@@ -1056,6 +1065,12 @@ public class Login extends Application{
 		orderNowBt.setWrapText(true);
 		orderNowBt.setStyle("-fx-background-color: #FF0606; -fx-text-fill: white; -fx-border-radius: 30px;"); 
 		ButtonHoverRed(orderNowBt);
+		
+		orderNowBt.setOnAction(e ->{
+			calTotalPrice(pizza, sizegroup, checkBoxesLeft, checkBoxesRight);
+
+		});
+		
 		addOrderBox.getChildren().add(orderNowBt);
 		addOrderBox.setAlignment(Pos.BASELINE_RIGHT);
 		
@@ -1074,6 +1089,81 @@ public class Login extends Application{
 		
 		Scene menusc = new Scene(menuPane, 1100, 700);
 		primaryStage.setScene(menusc);
+ 	}
+ 	
+ 	private void calTotalPrice(Pizza pizza, ToggleGroup sizegroup, VBox checkBoxesLeft, VBox checkBoxesRight) {
+ 		double totalPrice = 0;
+ 	
+ 	    RadioButton selectedSize = (RadioButton) sizegroup.getSelectedToggle();
+ 	    String selectedSizeText = selectedSize.getText();
+ 	    String[] sizeParts = selectedSizeText.split("   RM");
+ 	    double sizePrice = Double.parseDouble(sizeParts[1]);
+
+ 	    totalPrice = sizePrice;
+ 	    
+ 	    // Add the prices of the selected toppings
+ 	    CheckBox chkCheese = (CheckBox) checkBoxesLeft.getChildren().get(0);
+ 	    if (chkCheese.isSelected()) {
+ 	        totalPrice += 3.00;
+ 	    }
+ 	    CheckBox chkOnion = (CheckBox) checkBoxesLeft.getChildren().get(1);
+ 	    if (chkOnion.isSelected()) {
+ 	        totalPrice += 1.50;
+ 	    }	    
+ 	    CheckBox chkOlive = (CheckBox) checkBoxesLeft.getChildren().get(2);
+ 	    if (chkOlive.isSelected()) {
+ 	        totalPrice += 2.50;
+ 	    }	  
+ 	    CheckBox chkBeefPepperoni = (CheckBox) checkBoxesLeft.getChildren().get(3);
+ 	    if (chkBeefPepperoni.isSelected()) {
+ 	        totalPrice += 3.00;
+ 	    }	  
+ 	    CheckBox chkChickenPepperoni = (CheckBox) checkBoxesRight.getChildren().get(0);
+ 	    if (chkChickenPepperoni.isSelected()) {
+ 	        totalPrice += 2.90;
+ 	    }	  
+ 	    CheckBox chkPineapple = (CheckBox) checkBoxesRight.getChildren().get(1);
+ 	    if (chkPineapple.isSelected()) {
+ 	        totalPrice += 1.50;
+ 	    }
+ 	    CheckBox chkMushroom = (CheckBox) checkBoxesRight.getChildren().get(2);
+ 	    if (chkMushroom.isSelected()) {
+ 	        totalPrice += 2.00;
+ 	    }
+ 	    CheckBox chkBellPepper = (CheckBox) checkBoxesRight.getChildren().get(3);
+ 	    if (chkBellPepper.isSelected()) {
+ 	        totalPrice += 2.00;
+ 	    }
+ 	    
+ 	    //add the pizza to the cart
+ 	    pizza.setItemPrice(totalPrice);
+ 	    pizza.incrementQuantity();
+ 	    
+ 	    addCusPizza(pizza, totalPrice);
+ 	   
+ 	}
+ 	
+ 	private void addCusPizza(Pizza pizza, double totalPrice) {
+		
+		boolean foundInCart = false;
+	    
+		String cusPizzaName = pizza.getItemName() + " (customized)";
+	    
+	    if (!foundInCart) {
+	      Item item = new Item(cusPizzaName);
+	      item.setItemPrice(totalPrice);
+	      item.setItemDesc(pizza.getItemDesc());
+	      item.setItemQuantity(1);
+	      item.setItemImagePath(pizza.getItemImagePath());
+	      cartList.add(item);
+	    }
+	   
+		
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("Success");
+		alert.setHeaderText("Item added to cart");
+		alert.setContentText("You have successfully added the item to cart!");
+		alert.showAndWait(); 		
  	}
  	
  	private void viewCart() {
@@ -1187,7 +1277,7 @@ public class Login extends Application{
 		    
 		    //vbox to store names of pizza
 		    VBox nameBox = new VBox();
-		    nameBox.setPrefWidth(300);
+		    nameBox.setPrefWidth(350);
 		    nameBox.setPadding(new Insets(20));
 		    
 		    HBox names = new HBox();
@@ -1263,7 +1353,7 @@ public class Login extends Application{
 			nameBox.getChildren().addAll(names, customizeLink);
 			
 			customizeLink.setOnAction(e -> {
-				customize();
+				customize((Pizza) item);
 			});
 		    
 		    itemBox.getChildren().addAll(photoBox, nameBox, quantityBox, buttons);
