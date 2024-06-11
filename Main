@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -44,6 +46,7 @@ public class Login extends Application{
 	public static List<Item> cartList = new ArrayList<>();
 	public double totalPrice = 0;
 	public double pizzaPrice = 0;
+	public double pay = 0.0;
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -641,7 +644,6 @@ public class Login extends Application{
 		
 		HBox choices = new HBox();
 		choices.setStyle("-fx-background-color: #ffffff;");
-		//choices.setPrefHeight(300);
 		choices.setSpacing(30);
 		
 		String[] pizzaNames = {"Italian Olive", "Classic Pepperoni", "Italian Dream",
@@ -651,37 +653,37 @@ public class Login extends Application{
 		
 		itemList = new ArrayList<>();
 		
-		itemList.add(new Pizza("ID000001", "Italian Olive", 20.00, "The Italian Olive is packed with classic toppings, paired with our signature white sauce.",
+		itemList.add(new Pizza("ID000001", "Italian Olive", 20.00, 0.00, "The Italian Olive is packed with classic toppings, paired with our signature white sauce.",
 		        10, 0, "Pizza2.png", "Handmade Crust", "Regular", "White Sauce"));
 
-		itemList.add(new Pizza("ID000002", "Classic Pepperoni", 25.90, "Made with top pepperoni and ingredients, the deliciousness of our classic pepperoni pizza will leave you wanting more!",
+		itemList.add(new Pizza("ID000002", "Classic Pepperoni", 25.90, 0.00, "Made with top pepperoni and ingredients, the deliciousness of our classic pepperoni pizza will leave you wanting more!",
 		        15, 0, "Pizza3.png", "New York Style", "Regular", "Tomato Sauce"));
 
-		itemList.add(new Pizza("ID000003", "Italian Dream", 39.90, "This pizzeria classic will have you dreaming. Classic tomato sauce topped with mozzarella and basil leaves!",
+		itemList.add(new Pizza("ID000003", "Italian Dream", 39.90, 0.00, "This pizzeria classic will have you dreaming. Classic tomato sauce topped with mozzarella and basil leaves!",
 		        7, 0, "Pizza4.png", "Handmade Crust", "Regular", "Tomato Sauce"));
 
-		itemList.add(new Pizza("ID000004", "Seafood Fiesta", 40.60, "A seafood fiesta is your mouth as this pizza is packed with flavors and ingredients such as crab, tuna, shrimps, and garlic butter.",
+		itemList.add(new Pizza("ID000004", "Seafood Fiesta", 40.60, 0.00, "A seafood fiesta is your mouth as this pizza is packed with flavors and ingredients such as crab, tuna, shrimps, and garlic butter.",
 		        17, 0, "Pizza5.png", "Handmade Crust", "Regular", "White Sauce"));
 
-		itemList.add(new Pizza("ID000005", "Cheezus", 36.50, "Preach the god of cheese pizzas, Cheezus, made with top quality cheese, including parmesan, mozzarella, cheddar and provolone.",
+		itemList.add(new Pizza("ID000005", "Cheezus", 36.50, 0.00, "Preach the god of cheese pizzas, Cheezus, made with top quality cheese, including parmesan, mozzarella, cheddar and provolone.",
 		        8, 0, "Pizza6.png", "Handmade Crust", "Regular", "White Sauce"));
 
-		itemList.add(new Pizza("ID000006", "Classy Prosciutto", 37.50, "Nothing classier and more delicious than our chef's choice, the prosciutto pizza!",
+		itemList.add(new Pizza("ID000006", "Classy Prosciutto", 37.50, 0.00, "Nothing classier and more delicious than our chef's choice, the prosciutto pizza!",
 		        5, 0, "Pizza7.png", "Ultra Thin", "Regular", "Tomato Sauce"));
 
-		itemList.add(new Pizza("ID000007", "Mushroom Mania", 25.50, "Creamy mushroom deliciousness.",
+		itemList.add(new Pizza("ID000007", "Mushroom Mania", 25.50, 0.00, "Creamy mushroom deliciousness.",
 		        5, 0, "Pizza8.png", "New York Style", "Regular", "White Sauce"));
 
-		itemList.add(new Pizza("ID000008", "Vegetarian's Choice", 31.20, "Our best choice if you are vegetarian or vegan!",
+		itemList.add(new Pizza("ID000008", "Vegetarian's Choice", 31.20, 0.00, "Our best choice if you are vegetarian or vegan!",
 		        6, 0, "Pizza9.png", "Handmade Crust", "Regular", "Tomato Sauce"));
 
-		itemList.add(new Pizza("ID000009", "Woody Oven", 23.10, "Healthy and tasty, try out our latest recipe!",
+		itemList.add(new Pizza("ID000009", "Woody Oven", 23.10, 0.00, "Healthy and tasty, try out our latest recipe!",
 		        4, 0, "Pizza10.png", "New York Style", "Regular", "Tomato Sauce"));
 
-		itemList.add(new Pizza("ID000010", "Tomato Goodness", 22.30, "Calling out all tomato lovers to try this out!",
+		itemList.add(new Pizza("ID000010", "Tomato Goodness", 22.30, 0.00, "Calling out all tomato lovers to try this out!",
 		        8, 0, "Pizza11.png", "Handmade Crust", "Regular", "Tomato Sauce"));
 
-		itemList.add(new Pizza("ID000011", "Hawaiian Taste", 25.40, "Aloha! Taste the goodness with our fan-favourite and chef-favourite hawaiian pizza!",
+		itemList.add(new Pizza("ID000011", "Hawaiian Taste", 25.40, 0.00, "Aloha! Taste the goodness with our fan-favourite and chef-favourite hawaiian pizza!",
 		        16, 0, "Pizza12.png", "New York Style", "Regular", "Tomato Sauce"));
 
 		for(int i = 0; i < itemList.size(); i++) {
@@ -694,13 +696,6 @@ public class Login extends Application{
 			Label pizzaLabel = new Label(pizzaNames[i]);
 			pizzaLabel.setPadding(new Insets(5));
 			pizzaLabel.setFont(Font.font("Futura", FontWeight.BOLD, 17));
-			
-			Button pizzaBt = new Button();
-			pizzaBt.setGraphic(pizzaImg);
-			
-			pizzaBt.setOnMouseClicked(e -> {
-			    customize(pizza);
-			});
 			
 			Label pizzaPrice = new Label(String.format("RM %.2f", pizzaPrices[i]));
 			pizzaPrice.setFont(Font.font("Futura", FontWeight.BOLD, 15));
@@ -802,6 +797,9 @@ public class Login extends Application{
 	    for (Item itemInCart : cartList) {
 	        if (itemInCart.getItemName().equals(pizza.getItemName())) {
 	          itemInCart.incrementQuantity();
+	          itemInCart.setItemPrice(pizza.getItemPrice());
+	          itemInCart.setItemTotalPrice(pizza.calPizzaQuantity(itemInCart.getItemQuantity()));
+	          pay += pizza.getItemPrice();
 	          foundInCart = true;
 	          break;
 	        }
@@ -813,10 +811,11 @@ public class Login extends Application{
 	      item.setItemDesc(pizza.getItemDesc());
 	      item.setItemQuantity(1);
 	      item.setItemImagePath(pizza.getItemImagePath());
+	      item.setItemTotalPrice(pizza.getItemPrice());
+          pay += item.getItemPrice();
 	      cartList.add(item);
 	    }
 	   
-		
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("Success");
 		alert.setHeaderText("Item added to cart");
@@ -825,11 +824,6 @@ public class Login extends Application{
  	}
  	
  	private void customize(Pizza pizza) {
- 		
- 		//BorderPane root = new BorderPane();
-		//root.setStyle("-fx-background-color: #FFFFFF;");
- 		
- 		
  		
  		HBox logoHeader = new HBox();
 		logoHeader.setStyle("-fx-background-color: #1B339B;");
@@ -1067,7 +1061,7 @@ public class Login extends Application{
 		ButtonHoverRed(orderNowBt);
 		
 		orderNowBt.setOnAction(e ->{
-			calTotalPrice(pizza, sizegroup, checkBoxesLeft, checkBoxesRight);
+			calTotalPrice(pizza, sizegroup, saucegroup, checkBoxesLeft, checkBoxesRight);
 
 		});
 		
@@ -1091,7 +1085,7 @@ public class Login extends Application{
 		primaryStage.setScene(menusc);
  	}
  	
- 	private void calTotalPrice(Pizza pizza, ToggleGroup sizegroup, VBox checkBoxesLeft, VBox checkBoxesRight) {
+ 	private void calTotalPrice(Pizza pizza, ToggleGroup sizegroup, ToggleGroup saucegroup, VBox checkBoxesLeft, VBox checkBoxesRight) {
  		double totalPrice = 0;
  	
  	    RadioButton selectedSize = (RadioButton) sizegroup.getSelectedToggle();
@@ -1101,6 +1095,14 @@ public class Login extends Application{
 
  	    totalPrice = sizePrice;
  	    
+ 	    // Get the selected toggle from the sauce radio button group
+ 	    RadioButton selSauce = (RadioButton) saucegroup.getSelectedToggle();
+
+ 	    // Check if the special sauce is selected
+ 	    if(selSauce != null && selSauce.getText().equals("Special Sauce  +RM2.00")) {
+ 	        totalPrice += 2.00; // Add the extra charge for special sauce
+ 	    }
+
  	    // Add the prices of the selected toppings
  	    CheckBox chkCheese = (CheckBox) checkBoxesLeft.getChildren().get(0);
  	    if (chkCheese.isSelected()) {
@@ -1138,6 +1140,7 @@ public class Login extends Application{
  	    //add the pizza to the cart
  	    pizza.setItemPrice(totalPrice);
  	    pizza.incrementQuantity();
+ 	    pay += totalPrice;
  	    
  	    addCusPizza(pizza, totalPrice);
  	   
@@ -1155,6 +1158,7 @@ public class Login extends Application{
 	      item.setItemDesc(pizza.getItemDesc());
 	      item.setItemQuantity(1);
 	      item.setItemImagePath(pizza.getItemImagePath());
+	      item.setItemTotalPrice(pizza.getItemPrice());
 	      cartList.add(item);
 	    }
 	   
@@ -1249,11 +1253,16 @@ public class Login extends Application{
 		
 		VBox displayBox = new VBox();
 		displayBox.setStyle("-fx-background-color: #FFFFFF;");
-		displayBox.setPrefHeight(900);
+		displayBox.setPrefHeight(500);
+				
+		Label totalPriceLabel = new Label("Total: RM" + String.format("%.2f", pay));
+		totalPriceLabel.setFont(Font.font("Futura", FontWeight.BOLD, 22));
+		totalPriceLabel.setTextFill(Color.web("#1B339B"));
+		totalPriceLabel.setPadding(new Insets(20));
 		
 		//display list of items in cart
 		for (final Item item : cartList) {
-			
+		    
 		    HBox itemBox = new HBox();
 		    itemBox.setSpacing(10);
 		    itemBox.setAlignment(Pos.CENTER);
@@ -1313,19 +1322,32 @@ public class Login extends Application{
 		    VBox buttonBox = new VBox();
 		    buttonBox.setSpacing(5);
 		    buttonBox.setPadding(new Insets(20));
-		    
+		   
 		    HBox buttons = new HBox();
 		    buttons.setSpacing(5);
 		    buttons.setPadding(new Insets(20));
 		    
+	        priceLabel.setText(String.format("RM %.2f", item.getItemTotalPrice()));
+	        totalPriceLabel.setText(String.format("Total RM %.2f", pay));
+	        
 		    //increment and decrement buttons
 		    Button incrementBt = new Button("+");
 		    incrementBt.setStyle("-fx-background-color: #1B339B; -fx-text-fill: white;"); 
 			ButtonHoverBlue(incrementBt);
 		    incrementBt.setOnAction(e -> {
 		        item.incrementQuantity();
+		        //pay += item.getItemPrice();
+		        
 		        quantityLabel.setText(" - Quantity: " + item.getItemQuantity());
 		        priceLabel.setText(String.format("RM %.2f", item.calPizzaQuantity(item.getItemQuantity())));
+		        item.setItemTotalPrice(item.calPizzaQuantity(item.getItemQuantity()));
+		        
+		        // Recalculate the total pay
+		        pay = 0.0;
+		        for (Item cartItem : cartList) {
+		            pay += cartItem.getItemTotalPrice();
+		        }
+		        totalPriceLabel.setText("Total: RM" + String.format("%.2f", pay));
 		    });
 
 		    Button decrementBt = new Button("-");
@@ -1336,9 +1358,25 @@ public class Login extends Application{
 		        if(item.getItemQuantity() <=0) {
 		            cartList.remove(item);
 		            displayBox.getChildren().remove(itemBox);
+		            
+		            if(pay <= 0) {
+		            	pay = 0.0;
+		            }
+		            else {
+		            	pay -= item.getItemTotalPrice();
+		            }
 		        }
+
 		        quantityLabel.setText(" - Quantity: " + item.getItemQuantity());
 		        priceLabel.setText(String.format("RM %.2f", item.calPizzaQuantity(item.getItemQuantity())));
+		        item.setItemTotalPrice(item.calPizzaQuantity(item.getItemQuantity()));
+		        
+		        
+		        pay = 0.0;
+		        for (Item cartItem : cartList) {
+		            pay += cartItem.getItemTotalPrice();
+		        }
+		        totalPriceLabel.setText("Total: RM" + String.format("%.2f", pay));
 		    });
 		    
 		    buttons.getChildren().addAll(incrementBt, decrementBt);
@@ -1355,12 +1393,35 @@ public class Login extends Application{
 			customizeLink.setOnAction(e -> {
 				customize((Pizza) item);
 			});
-		    
+			
 		    itemBox.getChildren().addAll(photoBox, nameBox, quantityBox, buttons);
 		    displayBox.getChildren().add(itemBox);
+		    
+		    pay += item.getItemPrice();
 		}
+		
+		//to store the checkout button
+		HBox checkoutBox = new HBox();
+		checkoutBox.setPadding(new Insets(20));
+		checkoutBox.setStyle("-fx-background-color: #FFFFFF;");
+		
+		Button checkoutBt = new Button("ADD TO ORDER");
+		checkoutBt.setPrefSize(150, 40);
+		checkoutBt.setFont(Font.font("SansSerif", FontWeight.BOLD, 15));
+		checkoutBt.setWrapText(true);
+		checkoutBt.setStyle("-fx-background-color: #FF0606; -fx-text-fill: white; -fx-border-radius: 30px;"); 
+		ButtonHoverRed(checkoutBt);
+		
+		checkoutBt.setOnAction(e ->{
+			
+
+		});
+		
+		checkoutBox.getChildren().addAll(totalPriceLabel, checkoutBt);
+		checkoutBox.setAlignment(Pos.BASELINE_RIGHT);
+		
 		VBox cartBox = new VBox();
-		cartBox.getChildren().addAll(logoHeader, menubarBox, displayBox);
+		cartBox.getChildren().addAll(logoHeader, menubarBox, displayBox, checkoutBox);
 		
 		BorderPane menuPane = new BorderPane();
 		menuPane.setPadding(new Insets(10));
@@ -1376,6 +1437,107 @@ public class Login extends Application{
  		
  	}
 	
+ 	private void paymentScreen() {
+		
+		HBox logoHeader = new HBox();
+		logoHeader.setStyle("-fx-background-color: #1B339B;");
+		logoHeader.setPrefHeight(55);
+		logoHeader.setMinHeight(0);
+		ImageView logoView = new ImageView("PizzaPlanetLogo.png");
+		logoView.setFitWidth(110);
+		logoView.setFitHeight(110);
+		
+		logoHeader.getChildren().add(logoView);
+		logoHeader.setAlignment(Pos.CENTER);
+		
+		HBox menubarBox = new HBox();
+		menubarBox.setStyle("-fx-background-color: #ACACD0;");
+		menubarBox.setPrefHeight(35);
+		menubarBox.setSpacing(110);
+		menubarBox.setAlignment(Pos.CENTER);
+		
+		//home button
+		Button homeBt = new Button("Home");
+		homeBt.setPrefSize(100, 35);
+		homeBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		homeBt.setWrapText(true);
+		homeBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(homeBt);
+		
+		homeBt.setOnAction(e -> {
+			menu();
+		});
+		
+		//view menu button
+		Button menuBt = new Button("Menu");
+		menuBt.setPrefSize(100, 35);
+		menuBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		menuBt.setWrapText(true);
+		menuBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(menuBt);
+		
+		menuBt.setOnAction(e -> {
+			//start(primaryStage);
+		});
+		
+		//about us button
+		Button aboutUsBt = new Button("About Us");
+		aboutUsBt.setPrefSize(100, 35);
+		aboutUsBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		aboutUsBt.setWrapText(true);
+		aboutUsBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(aboutUsBt);
+		
+		aboutUsBt.setOnAction(e -> {
+			//start(primaryStage);
+		});
+		
+		//contact us button
+		Button contactUsBt = new Button("Contact Us");
+		contactUsBt.setPrefSize(120, 35);
+		contactUsBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		contactUsBt.setWrapText(true);
+		contactUsBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(contactUsBt);
+		
+		contactUsBt.setOnAction(e -> {
+			//start(primaryStage);
+		});
+		
+		//cart button
+		Button cartBt = new Button("Cart");
+		cartBt.setPrefSize(100, 50);
+		cartBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+		cartBt.setWrapText(true);
+		cartBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
+		ButtonHoverPurple(cartBt);
+		
+		cartBt.setOnAction(e -> {
+			viewCart();
+		});
+		
+		menubarBox.getChildren().addAll(homeBt, menuBt, aboutUsBt, contactUsBt, cartBt);
+		
+ 		
+		
+		
+		
+		
+		
+		
+		
+		
+		VBox menuBox = new VBox();
+		menuBox.getChildren().addAll(logoHeader, menubarBox);
+		
+		BorderPane menuPane = new BorderPane();
+		menuPane.setPadding(new Insets(10));
+		menuPane.setTop(menuBox);
+		
+		Scene menusc = new Scene(menuPane, 1100, 700);
+		primaryStage.setScene(menusc);
+ 	}
+ 	
 	private void ButtonHoverBlue(Button button) {
 		button.setOnMouseEntered(e ->button.setStyle("-fx-background-color: #162773; -fx-text-fill: #FFBD59;"));
         button.setOnMouseExited(e ->button.setStyle("-fx-background-color: #1B339B;-fx-text-fill: white;"));
