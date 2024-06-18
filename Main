@@ -1397,7 +1397,6 @@ public class Login extends Application{
 		    itemBox.getChildren().addAll(photoBox, nameBox, quantityBox, buttons);
 		    displayBox.getChildren().add(itemBox);
 		    
-		    pay += item.getItemPrice();
 		}
 		
 		//to store the checkout button
@@ -1405,7 +1404,7 @@ public class Login extends Application{
 		checkoutBox.setPadding(new Insets(20));
 		checkoutBox.setStyle("-fx-background-color: #FFFFFF;");
 		
-		Button checkoutBt = new Button("ADD TO ORDER");
+		Button checkoutBt = new Button("CHECKOUT");
 		checkoutBt.setPrefSize(150, 40);
 		checkoutBt.setFont(Font.font("SansSerif", FontWeight.BOLD, 15));
 		checkoutBt.setWrapText(true);
@@ -1413,8 +1412,7 @@ public class Login extends Application{
 		ButtonHoverRed(checkoutBt);
 		
 		checkoutBt.setOnAction(e ->{
-			
-
+			paymentScreen();
 		});
 		
 		checkoutBox.getChildren().addAll(totalPriceLabel, checkoutBt);
@@ -1438,104 +1436,170 @@ public class Login extends Application{
  	}
 	
  	private void paymentScreen() {
-		
-		HBox logoHeader = new HBox();
-		logoHeader.setStyle("-fx-background-color: #1B339B;");
-		logoHeader.setPrefHeight(55);
-		logoHeader.setMinHeight(0);
-		ImageView logoView = new ImageView("PizzaPlanetLogo.png");
-		logoView.setFitWidth(110);
-		logoView.setFitHeight(110);
-		
-		logoHeader.getChildren().add(logoView);
-		logoHeader.setAlignment(Pos.CENTER);
-		
-		HBox menubarBox = new HBox();
-		menubarBox.setStyle("-fx-background-color: #ACACD0;");
-		menubarBox.setPrefHeight(35);
-		menubarBox.setSpacing(110);
-		menubarBox.setAlignment(Pos.CENTER);
-		
-		//home button
-		Button homeBt = new Button("Home");
-		homeBt.setPrefSize(100, 35);
-		homeBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
-		homeBt.setWrapText(true);
-		homeBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
-		ButtonHoverPurple(homeBt);
-		
-		homeBt.setOnAction(e -> {
-			menu();
-		});
-		
-		//view menu button
-		Button menuBt = new Button("Menu");
-		menuBt.setPrefSize(100, 35);
-		menuBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
-		menuBt.setWrapText(true);
-		menuBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
-		ButtonHoverPurple(menuBt);
-		
-		menuBt.setOnAction(e -> {
-			//start(primaryStage);
-		});
-		
-		//about us button
-		Button aboutUsBt = new Button("About Us");
-		aboutUsBt.setPrefSize(100, 35);
-		aboutUsBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
-		aboutUsBt.setWrapText(true);
-		aboutUsBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
-		ButtonHoverPurple(aboutUsBt);
-		
-		aboutUsBt.setOnAction(e -> {
-			//start(primaryStage);
-		});
-		
-		//contact us button
-		Button contactUsBt = new Button("Contact Us");
-		contactUsBt.setPrefSize(120, 35);
-		contactUsBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
-		contactUsBt.setWrapText(true);
-		contactUsBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
-		ButtonHoverPurple(contactUsBt);
-		
-		contactUsBt.setOnAction(e -> {
-			//start(primaryStage);
-		});
-		
-		//cart button
-		Button cartBt = new Button("Cart");
-		cartBt.setPrefSize(100, 50);
-		cartBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
-		cartBt.setWrapText(true);
-		cartBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;"); 
-		ButtonHoverPurple(cartBt);
-		
-		cartBt.setOnAction(e -> {
-			viewCart();
-		});
-		
-		menubarBox.getChildren().addAll(homeBt, menuBt, aboutUsBt, contactUsBt, cartBt);
-		
- 		
-		
-		
-		
-		
-		
-		
-		
-		
-		VBox menuBox = new VBox();
-		menuBox.getChildren().addAll(logoHeader, menubarBox);
-		
-		BorderPane menuPane = new BorderPane();
-		menuPane.setPadding(new Insets(10));
-		menuPane.setTop(menuBox);
-		
-		Scene menusc = new Scene(menuPane, 1100, 700);
-		primaryStage.setScene(menusc);
+ 	    // Create logo header
+ 	    HBox logoHeader = new HBox();
+ 	    logoHeader.setStyle("-fx-background-color: #1B339B;");
+ 	    logoHeader.setPrefHeight(55);
+ 	    logoHeader.setMinHeight(0);
+ 	    ImageView logoView = new ImageView("PizzaPlanetLogo.png");
+ 	    logoView.setFitWidth(110);
+ 	    logoView.setFitHeight(110);
+ 	    logoHeader.getChildren().add(logoView);
+ 	    logoHeader.setAlignment(Pos.CENTER);
+
+ 	    // Create menu bar
+ 	    HBox menubarBox = new HBox();
+ 	    menubarBox.setStyle("-fx-background-color: #ACACD0;");
+ 	    menubarBox.setPrefHeight(35);
+ 	    menubarBox.setSpacing(110);
+ 	    menubarBox.setAlignment(Pos.CENTER);
+
+ 	    // Create buttons
+ 	    Button homeBt = new Button("Home");
+ 	    homeBt.setPrefSize(100, 35);
+ 	    homeBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+ 	    homeBt.setWrapText(true);
+ 	    homeBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;");
+ 	    ButtonHoverPurple(homeBt);
+ 	    homeBt.setOnAction(e -> {
+ 	        menu();
+ 	    });
+
+ 	    Button menuBt = new Button("Menu");
+ 	    menuBt.setPrefSize(100, 35);
+ 	    menuBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+ 	    menuBt.setWrapText(true);
+ 	    menuBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;");
+ 	    ButtonHoverPurple(menuBt);
+ 	    menuBt.setOnAction(e -> {
+ 	        // Add action for menu button
+ 	    });
+
+ 	    Button aboutUsBt = new Button("About Us");
+ 	    aboutUsBt.setPrefSize(100, 35);
+ 	    aboutUsBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+ 	    aboutUsBt.setWrapText(true);
+ 	    aboutUsBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;");
+ 	    ButtonHoverPurple(aboutUsBt);
+ 	    aboutUsBt.setOnAction(e -> {
+ 	        // Add action for about us button
+ 	    });
+
+ 	    Button contactUsBt = new Button("Contact Us");
+ 	    contactUsBt.setPrefSize(120, 35);
+ 	    contactUsBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+ 	    contactUsBt.setWrapText(true);
+ 	    contactUsBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;");
+ 	    ButtonHoverPurple(contactUsBt);
+ 	    contactUsBt.setOnAction(e -> {
+ 	        // Add action for contact us button
+ 	    });
+
+ 	    Button cartBt = new Button("Cart");
+ 	    cartBt.setPrefSize(100, 50);
+ 	    cartBt.setFont(Font.font("SansSerif", FontWeight.NORMAL, 17));
+ 	    cartBt.setWrapText(true);
+ 	    cartBt.setStyle("-fx-background-color: #ACACD0; -fx-text-fill: black;");
+ 	    ButtonHoverPurple(cartBt);
+ 	    cartBt.setOnAction(e -> {
+ 	        viewCart();
+ 	    });
+
+ 	    menubarBox.getChildren().addAll(homeBt, menuBt, aboutUsBt, contactUsBt, cartBt);
+
+ 	    // Create content boxes
+ 	    VBox loadingLogoBox = new VBox();
+ 	    ImageView loadingLogo = new ImageView("PendingCheckoutLogo.png");
+ 	    loadingLogoBox.setStyle("-fx-padding: 5px;");
+ 	    loadingLogoBox.setPrefWidth(50);
+ 	    loadingLogoBox.getChildren().add(loadingLogo);
+ 	    loadingLogoBox.setAlignment(Pos.CENTER_LEFT);
+
+ 	    VBox addressContentBox = new VBox();
+ 	    Label addressTypeLabel = new Label("Address Type");
+ 	    VBox addressTypePane = new VBox();
+ 	    addressTypePane.setPadding(new Insets(20));
+ 	    RadioButton addressType1 = new RadioButton("Landed");
+ 	    RadioButton addressType2 = new RadioButton("Apartment");
+ 	    RadioButton addressType3 = new RadioButton("Building/Other");
+ 	    addressTypePane.getChildren().addAll(addressType1, addressType2, addressType3);
+ 	    addressType1.setSelected(true);
+
+ 	    ToggleGroup addressGroup = new ToggleGroup();
+ 	    addressType1.setToggleGroup(addressGroup);
+ 	    addressType2.setToggleGroup(addressGroup);
+ 	    addressType3.setToggleGroup(addressGroup);
+
+ 	    Label unitNoLabel = new Label("Unit No: ");
+ 	    TextField unitNoTf = new TextField();
+ 	    unitNoTf.setPromptText("Unit No");
+ 	    unitNoTf.setPrefSize(50, 30);
+
+ 	    Label addressLabel = new Label("Address: ");
+ 	    TextArea finalAddressTa = new TextArea();
+ 	    finalAddressTa.setPromptText("Enter your current address/location");
+ 	    finalAddressTa.setPrefSize(300, 130);
+
+ 	    unitNoTf.setOnKeyPressed(e -> {
+ 	        if (e.getCode() == KeyCode.ENTER) {
+ 	            finalAddressTa.requestFocus();
+ 	        }
+ 	    });
+
+ 	    addressContentBox.getChildren().addAll(addressTypeLabel, addressTypePane, unitNoLabel, unitNoTf, addressLabel, finalAddressTa);
+
+ 	    VBox paymentContentBox = new VBox();
+ 	    Label paymentTypeLabel = new Label("Payment");
+ 	    VBox paymentTypePane = new VBox();
+ 	    paymentTypePane.setPadding(new Insets(20));
+ 	    RadioButton payType1 = new RadioButton("Online payment");
+ 	    RadioButton payType2 = new RadioButton("Credit/Debit card");
+ 	    RadioButton payType3 = new RadioButton("Cash (Upon delivery)");
+ 	    paymentTypePane.getChildren().addAll(payType1, payType2, payType3);
+ 	    payType1.setSelected(true);
+
+ 	    ToggleGroup paymentGroup = new ToggleGroup();
+ 	    payType1.setToggleGroup(paymentGroup);
+ 	    payType2.setToggleGroup(paymentGroup);
+ 	    payType3.setToggleGroup(paymentGroup);
+
+ 	    Label orderTypeLabel = new Label("Order Type");
+ 	    VBox orderTypePane = new VBox();
+ 	    orderTypePane.setPadding(new Insets(20));
+ 	    RadioButton orderType1 = new RadioButton("Delivery payment");
+ 	    RadioButton orderType2 = new RadioButton("Take away");
+ 	    orderTypePane.getChildren().addAll(orderType1, orderType2);
+ 	    orderType1.setSelected(true);
+
+ 	    ToggleGroup orderGroup = new ToggleGroup();
+ 	    orderType1.setToggleGroup(orderGroup);
+ 	    orderType2.setToggleGroup(orderGroup);
+
+ 	    Label orderTimeLabel = new Label("Order Time");
+ 	    VBox orderTimePane = new VBox();
+ 	    orderTimePane.setPadding(new Insets(10));
+ 	    RadioButton orderTime1 = new RadioButton("Now");
+ 	    RadioButton orderTime2 = new RadioButton("Later");
+ 	    orderTimePane.getChildren().addAll(orderTime1, orderTime2);
+ 	    orderTime1.setSelected(true);
+
+ 	    ToggleGroup orderTimeGroup = new ToggleGroup();
+ 	    orderTime1.setToggleGroup(orderTimeGroup);
+ 	    orderTime2.setToggleGroup(orderTimeGroup);
+
+ 	    paymentContentBox.getChildren().addAll(paymentTypeLabel, paymentTypePane, orderTypeLabel, orderTypePane, orderTimeLabel, orderTimePane);
+
+ 	    HBox pageBox = new HBox();
+ 	    pageBox.getChildren().addAll(loadingLogoBox, addressContentBox, paymentContentBox);
+
+ 	    BorderPane menuPane = new BorderPane();
+ 	    menuPane.setPadding(new Insets(10));
+ 	    menuPane.setTop(new VBox(logoHeader, menubarBox));
+ 	    menuPane.setCenter(pageBox);
+
+ 	    Scene menusc = new Scene(menuPane, 1100, 700);
+ 	    primaryStage.setScene(menusc);
+ 	    primaryStage.show();
  	}
  	
 	private void ButtonHoverBlue(Button button) {
