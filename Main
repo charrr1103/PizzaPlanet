@@ -7,18 +7,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
@@ -758,6 +761,8 @@ public class Login extends Application{
 				"Group Deals", "Chef's Choice", "Sides", "Drinks"};
 		
 		for(int i = 0; i < categoryNames.length; i++) {
+			final Pizza pizza = (Pizza)itemList.get(i);
+			
 			Label catLabel = new Label(categoryNames[i]);
 			catLabel.setPadding(new Insets(10));
 			catLabel.setFont(Font.font("Futura", FontWeight.BOLD, 17));
@@ -765,6 +770,10 @@ public class Login extends Application{
 			ImageView category = new ImageView("Cat" + (i + 1) + ".png");
 			category.setFitWidth(175);
 			category.setFitHeight(245);
+			
+			category.setOnMouseClicked(e -> {
+				customize(pizza);
+			});
 			
 			VBox cat = new VBox();
 			cat.setPadding(new Insets(10));
@@ -959,8 +968,11 @@ public class Login extends Application{
 		VBox sizeRadiobuttonPane = new VBox(20);
 		sizeRadiobuttonPane.setPadding(new Insets(20));
 		RadioButton rbLarge = new RadioButton("Large   RM" + String.format("%.2f", pizza.calLargePrice(pizza.getItemPrice())));
+		rbLarge.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
 		RadioButton rbRegular = new RadioButton("Regular   RM" + String.format("%.2f", pizza.getItemPrice()));
+		rbRegular.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
 		RadioButton rbSmall = new RadioButton("Small   RM" + String.format("%.2f", pizza.calSmallPrice(pizza.getItemPrice())));
+		rbSmall.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
 		sizeRadiobuttonPane.getChildren().addAll(pSize, rbLarge, rbRegular, rbSmall);
 		
 		rbLarge.setSelected(true);
@@ -979,8 +991,11 @@ public class Login extends Application{
 		VBox crustRadiobuttonPane = new VBox(20);
 		crustRadiobuttonPane.setPadding(new Insets(20));
 		RadioButton rbHandmade = new RadioButton("Handmade Crust");
+		rbHandmade.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
 		RadioButton rbNewYork = new RadioButton("New York Style");
+		rbNewYork.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
 		RadioButton rbThin = new RadioButton("Ultra Thin");
+		rbThin.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
 		crustRadiobuttonPane.getChildren().addAll(pCrust, rbHandmade, rbNewYork, rbThin);
 		
 		rbHandmade.setSelected(true);
@@ -1000,8 +1015,11 @@ public class Login extends Application{
 		VBox sauceRadiobuttonPane = new VBox(20);
 		sauceRadiobuttonPane.setPadding(new Insets(20));
 		RadioButton rbTomato = new RadioButton("Tomato");
+		rbTomato.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
 		RadioButton rbWhiteSauce = new RadioButton("White Sauce");
+		rbWhiteSauce.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
 		RadioButton rbSpecialSauce = new RadioButton("Special Sauce  +RM2.00");
+		rbSpecialSauce.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
 		sauceRadiobuttonPane.getChildren().addAll(pSauce, rbTomato, rbWhiteSauce, rbSpecialSauce);
 		
 		rbTomato.setSelected(true);
@@ -1030,16 +1048,24 @@ public class Login extends Application{
 		
 		//check box
 		CheckBox chkCheese = new CheckBox("Cheese   +RM3.00");
+		chkCheese.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
 		CheckBox chkOnion = new CheckBox("Onion   +RM1.50");
+		chkOnion.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
 		CheckBox chkOlive = new CheckBox("Olives   +RM2.50");
+		chkOlive.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
 		CheckBox chkBeefPepperoni = new CheckBox("Beef Pepperoni   +RM3.00");
-		
+		chkBeefPepperoni.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
+
 		checkBoxesLeft.getChildren().addAll(chkCheese, chkOnion, chkOlive, chkBeefPepperoni);
 		
 		CheckBox chkChickenPepperoni = new CheckBox("Chicken Pepperoni   +RM2.90");
+		chkChickenPepperoni.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
 		CheckBox chkPineapple = new CheckBox("Pineapple   +RM1.50");
+		chkPineapple.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
 		CheckBox chkMushroom = new CheckBox("Mushroom   +RM2.00");
+		chkMushroom.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
 		CheckBox chkBellPepper = new CheckBox("Bell Pepper   +RM2.00");
+		chkBellPepper.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
 		
 		checkBoxesRight.getChildren().addAll(chkChickenPepperoni, chkPineapple, chkMushroom, chkBellPepper);
 		
@@ -1084,6 +1110,8 @@ public class Login extends Application{
 		Scene menusc = new Scene(menuPane, 1100, 700);
 		primaryStage.setScene(menusc);
  	}
+ 	
+ 	
  	
  	private void calTotalPrice(Pizza pizza, ToggleGroup sizegroup, ToggleGroup saucegroup, VBox checkBoxesLeft, VBox checkBoxesRight) {
  		double totalPrice = 0;
@@ -1507,21 +1535,32 @@ public class Login extends Application{
 
  	    menubarBox.getChildren().addAll(homeBt, menuBt, aboutUsBt, contactUsBt, cartBt);
 
+ 	    VBox everythingBox = new VBox();
+ 	    
  	    // Create content boxes
  	    VBox loadingLogoBox = new VBox();
  	    ImageView loadingLogo = new ImageView("PendingCheckoutLogo.png");
  	    loadingLogoBox.setStyle("-fx-padding: 5px;");
- 	    loadingLogoBox.setPrefWidth(50);
+ 	    loadingLogoBox.setPrefWidth(40);
  	    loadingLogoBox.getChildren().add(loadingLogo);
- 	    loadingLogoBox.setAlignment(Pos.CENTER_LEFT);
+ 	    loadingLogoBox.setAlignment(Pos.CENTER);
 
  	    VBox addressContentBox = new VBox();
- 	    Label addressTypeLabel = new Label("Address Type");
- 	    VBox addressTypePane = new VBox();
+ 	    addressContentBox.setPadding(new Insets(20));
+ 	    addressContentBox.setSpacing(10);
+ 	    Text addressTypeLabel = new Text("Address Type");
+ 	    addressTypeLabel.setFont(Font.font("Futura", FontWeight.BOLD, 20));
+ 	    addressTypeLabel.setFill(Color.web("#1B339B"));
+ 	    VBox addressTypePane = new VBox(20);
  	    addressTypePane.setPadding(new Insets(20));
+ 	    addressTypePane.setSpacing(20);
  	    RadioButton addressType1 = new RadioButton("Landed");
+ 	    addressType1.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
  	    RadioButton addressType2 = new RadioButton("Apartment");
+ 	    addressType2.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
  	    RadioButton addressType3 = new RadioButton("Building/Other");
+ 	    addressType3.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
+ 	    
  	    addressTypePane.getChildren().addAll(addressType1, addressType2, addressType3);
  	    addressType1.setSelected(true);
 
@@ -1530,12 +1569,16 @@ public class Login extends Application{
  	    addressType2.setToggleGroup(addressGroup);
  	    addressType3.setToggleGroup(addressGroup);
 
- 	    Label unitNoLabel = new Label("Unit No: ");
+ 	    Text unitNoLabel = new Text("Unit No: ");
+ 	    unitNoLabel.setFont(Font.font("Futura", FontWeight.BOLD, 20));
+ 	    unitNoLabel.setFill(Color.web("#1B339B"));
  	    TextField unitNoTf = new TextField();
  	    unitNoTf.setPromptText("Unit No");
  	    unitNoTf.setPrefSize(50, 30);
 
- 	    Label addressLabel = new Label("Address: ");
+ 	    Text addressLabel = new Text("Address: ");
+ 	    addressLabel.setFont(Font.font("Futura", FontWeight.BOLD, 20));
+ 	    addressLabel.setFill(Color.web("#1B339B"));
  	    TextArea finalAddressTa = new TextArea();
  	    finalAddressTa.setPromptText("Enter your current address/location");
  	    finalAddressTa.setPrefSize(300, 130);
@@ -1549,12 +1592,21 @@ public class Login extends Application{
  	    addressContentBox.getChildren().addAll(addressTypeLabel, addressTypePane, unitNoLabel, unitNoTf, addressLabel, finalAddressTa);
 
  	    VBox paymentContentBox = new VBox();
- 	    Label paymentTypeLabel = new Label("Payment");
- 	    VBox paymentTypePane = new VBox();
+ 	    paymentContentBox.setPadding(new Insets(20));
+ 	    paymentContentBox.setSpacing(10);
+ 	    Text paymentTypeLabel = new Text("Payment");
+ 	    paymentTypeLabel.setFont(Font.font("Futura", FontWeight.BOLD, 20));
+ 	    paymentTypeLabel.setFill(Color.web("#1B339B"));
+ 	    VBox paymentTypePane = new VBox(20);
  	    paymentTypePane.setPadding(new Insets(20));
+ 	    paymentTypePane.setSpacing(20);
  	    RadioButton payType1 = new RadioButton("Online payment");
+ 	    payType1.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
  	    RadioButton payType2 = new RadioButton("Credit/Debit card");
+ 	    payType2.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
  	    RadioButton payType3 = new RadioButton("Cash (Upon delivery)");
+ 	    payType3.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
+ 	    
  	    paymentTypePane.getChildren().addAll(payType1, payType2, payType3);
  	    payType1.setSelected(true);
 
@@ -1563,11 +1615,16 @@ public class Login extends Application{
  	    payType2.setToggleGroup(paymentGroup);
  	    payType3.setToggleGroup(paymentGroup);
 
- 	    Label orderTypeLabel = new Label("Order Type");
+ 	    Text orderTypeLabel = new Text("Order Type");
+ 	    orderTypeLabel.setFont(Font.font("Futura", FontWeight.BOLD, 20));
+ 	    orderTypeLabel.setFill(Color.web("#1B339B"));
  	    VBox orderTypePane = new VBox();
  	    orderTypePane.setPadding(new Insets(20));
+ 	    orderTypePane.setSpacing(20);
  	    RadioButton orderType1 = new RadioButton("Delivery payment");
+ 	    orderType1.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
  	    RadioButton orderType2 = new RadioButton("Take away");
+ 	    orderType2.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
  	    orderTypePane.getChildren().addAll(orderType1, orderType2);
  	    orderType1.setSelected(true);
 
@@ -1575,11 +1632,16 @@ public class Login extends Application{
  	    orderType1.setToggleGroup(orderGroup);
  	    orderType2.setToggleGroup(orderGroup);
 
- 	    Label orderTimeLabel = new Label("Order Time");
+ 	    Text orderTimeLabel = new Text("Order Time");
+ 	    orderTimeLabel.setFont(Font.font("Futura", FontWeight.BOLD, 20));
+ 	    orderTimeLabel.setFill(Color.web("#1B339B"));
  	    VBox orderTimePane = new VBox();
- 	    orderTimePane.setPadding(new Insets(10));
+ 	    orderTimePane.setPadding(new Insets(20));
+ 	    orderTimePane.setSpacing(20);
  	    RadioButton orderTime1 = new RadioButton("Now");
+ 	    orderTime1.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
  	    RadioButton orderTime2 = new RadioButton("Later");
+ 	    orderTime2.setFont(Font.font("Futura", FontWeight.NORMAL, 16));
  	    orderTimePane.getChildren().addAll(orderTime1, orderTime2);
  	    orderTime1.setSelected(true);
 
@@ -1589,19 +1651,68 @@ public class Login extends Application{
 
  	    paymentContentBox.getChildren().addAll(paymentTypeLabel, paymentTypePane, orderTypeLabel, orderTypePane, orderTimeLabel, orderTimePane);
 
+		//to store the buttons
+		HBox buttonBox = new HBox();
+		buttonBox.setPadding(new Insets(20));
+		buttonBox.setSpacing(20);
+		buttonBox.setStyle("-fx-background-color: #FFFFFF;");
+		
+		Button backBt = new Button("BACK");
+		backBt.setPrefSize(100, 40);
+		backBt.setFont(Font.font("SansSerif", FontWeight.BOLD, 15));
+		backBt.setWrapText(true);
+		backBt.setStyle("-fx-background-color: #1B339B; -fx-text-fill: white; -fx-border-radius: 30px;"); 
+		ButtonHoverBlue(backBt);
+		
+		backBt.setOnAction(e ->{
+			viewCart();
+		});
+		
+		Button payBt = new Button("PAY");
+		payBt.setPrefSize(100, 40);
+		payBt.setFont(Font.font("SansSerif", FontWeight.BOLD, 15));
+		payBt.setWrapText(true);
+		payBt.setStyle("-fx-background-color: #FF0606; -fx-text-fill: white; -fx-border-radius: 30px;"); 
+		ButtonHoverRed(payBt);
+		
+		payBt.setOnAction(e ->{
+			showSuccessDialog();
+		});
+		
+		buttonBox.getChildren().addAll(backBt, payBt);
+		VBox.setMargin(buttonBox, new Insets(0, 0, 20, 0));
+		buttonBox.setAlignment(Pos.TOP_RIGHT);
+		
  	    HBox pageBox = new HBox();
+ 	    pageBox.setStyle("-fx-background-color: #FFFFFF;");
  	    pageBox.getChildren().addAll(loadingLogoBox, addressContentBox, paymentContentBox);
+		
+		everythingBox.getChildren().addAll(pageBox, buttonBox);
 
  	    BorderPane menuPane = new BorderPane();
  	    menuPane.setPadding(new Insets(10));
  	    menuPane.setTop(new VBox(logoHeader, menubarBox));
- 	    menuPane.setCenter(pageBox);
-
+ 	    menuPane.setCenter(everythingBox);
+ 	    
  	    Scene menusc = new Scene(menuPane, 1100, 700);
  	    primaryStage.setScene(menusc);
  	    primaryStage.show();
  	}
  	
+ 	private void showSuccessDialog() {
+ 		Dialog<Void> successDialog = new Dialog<>();
+ 	    successDialog.setTitle("Payment Successful");
+ 	    successDialog.setHeaderText("Your payment has been processed successfully.");
+
+ 	    Label successMessage = new Label("Thank you for your payment. You will receive a confirmation email shortly.");
+ 	    successMessage.setStyle("-fx-font-size: 16; -fx-font-weight: bold;");
+
+ 	    ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+ 	    successDialog.getDialogPane().getButtonTypes().add(okButton);
+ 	    successDialog.getDialogPane().setContent(successMessage);
+ 	    successDialog.showAndWait();
+ 	}
+
 	private void ButtonHoverBlue(Button button) {
 		button.setOnMouseEntered(e ->button.setStyle("-fx-background-color: #162773; -fx-text-fill: #FFBD59;"));
         button.setOnMouseExited(e ->button.setStyle("-fx-background-color: #1B339B;-fx-text-fill: white;"));
@@ -1628,4 +1739,3 @@ public class Login extends Application{
 	}
 
 }
-
